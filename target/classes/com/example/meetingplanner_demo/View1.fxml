@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.DatePicker?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="513.0" prefWidth="839.0" style="-fx-background-color: #e3f8fc;" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.meetingplanner_demo.Controller1">
+   <children>
+      <VBox alignment="TOP_CENTER" layoutX="46.0" layoutY="74.0" prefHeight="352.0" prefWidth="93.0" spacing="15.0">
+         <children>
+            <Label text="Title*">
+               <font>
+                  <Font size="14.0" />
+               </font>
+            </Label>
+            <Label text="Start*">
+               <font>
+                  <Font size="14.0" />
+               </font>
+            </Label>
+            <Label alignment="CENTER_RIGHT" text="End*">
+               <font>
+                  <Font size="14.0" />
+               </font>
+            </Label>
+            <Label text="Note">
+               <font>
+                  <Font size="14.0" />
+               </font>
+            </Label>
+            <Label alignment="CENTER" prefHeight="39.0" prefWidth="94.0" text="*-&gt;mandatory" textAlignment="JUSTIFY">
+               <padding>
+                  <Insets top="30.0" />
+               </padding>
+               <font>
+                  <Font name="System Bold" size="12.0" />
+               </font>
+            </Label>
+         </children>
+      </VBox>
+      <VBox layoutX="139.0" layoutY="74.0" prefHeight="238.0" prefWidth="238.0" spacing="5.0">
+         <children>
+            <TextField fx:id="inputTitle" layoutX="10.0" layoutY="10.0">
+               <font>
+                  <Font size="14.0" />
+               </font>
+            </TextField>
+            <DatePicker fx:id="inputStart" prefHeight="26.0" prefWidth="175.0" />
+            <DatePicker fx:id="inputEnd" prefHeight="28.0" prefWidth="175.0" />
+            <TextArea fx:id="inputNote" prefHeight="85.0" prefWidth="238.0" />
+            <Button fx:id="buttonCreate" mnemonicParsing="false" onAction="#createMeeting" text="Create Meeting">
+               <graphic>
+                  <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@../../../icons8_plus_+_512px.png" />
+                     </image>
+                  </ImageView>
+               </graphic></Button>
+            <HBox prefHeight="38.0" prefWidth="222.0" spacing="10.0">
+               <children>
+                  <Button fx:id="buttonUpdate" mnemonicParsing="false" onAction="#updateMeeting" prefHeight="26.0" prefWidth="81.0" text="Update">
+                     <graphic>
+                        <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
+                           <image>
+                              <Image url="@../../../icons8_restart_208px_1.png" />
+                           </image>
+                        </ImageView>
+                     </graphic></Button>
+                  <Label prefHeight="30.0" prefWidth="83.0" text="Meeting ID :">
+                     <font>
+                        <Font name="System Bold" size="14.0" />
+                     </font>
+                  </Label>
+                  <TextField fx:id="inputID" prefHeight="26.0" prefWidth="52.0" />
+               </children>
+            </HBox>
+         </children>
+      </VBox>
+      <TableView fx:id="tableMeetings" layoutX="395.0" layoutY="49.0" onMouseClicked="#displayMeetingData" prefHeight="406.0" prefWidth="433.0">
+        <columns>
+          <TableColumn fx:id="colID" prefWidth="29.60003662109375" text="ID" />
+          <TableColumn fx:id="colTitle" prefWidth="112.79998779296875" text="Title" />
+            <TableColumn fx:id="colStart" prefWidth="84.79998779296875" text="Start" />
+            <TableColumn fx:id="colEnd" prefWidth="89.60003662109375" text="End" />
+            <TableColumn fx:id="colNote" prefWidth="114.39998779296877" text="Note" />
+        </columns>
+      </TableView>
+      <Button fx:id="buttonDelete" layoutX="311.0" layoutY="321.0" mnemonicParsing="false" onAction="#deleteMeeting" text="Delete">
+         <graphic>
+            <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
+               <image>
+                  <Image url="@../../../icons8_delete_96px.png" />
+               </image>
+            </ImageView>
+         </graphic></Button>
+      <Label fx:id="labelForm" layoutX="58.0" layoutY="14.0" prefHeight="50.0" prefWidth="318.0">
+         <font>
+            <Font name="System Bold" size="14.0" />
+         </font>
+      </Label>
+   </children>
+</AnchorPane>
