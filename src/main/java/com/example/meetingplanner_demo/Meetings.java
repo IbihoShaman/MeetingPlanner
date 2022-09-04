@@ -1,5 +1,7 @@
 package com.example.meetingplanner_demo;
 
+import javafx.scene.text.Text;
+
 import java.util.Date;
 
 public class Meetings {
@@ -7,11 +9,10 @@ public class Meetings {
     private String title;
     private String start;
     private String end;
-    private String note;
+    //private String note;
 
 
     public Integer getID() { return ID; }
-
     public String getTitle() { return title; }
     public String getStart() {
         return start;
@@ -19,15 +20,13 @@ public class Meetings {
     public String getEnd() {
         return end;
     }
-    public String getNote() {
-        return note;
-    }
+    //public String getNote() { return note; }
 
-    public Meetings(Integer ID, String title, String start, String end, String note) {
+    public Meetings(Integer ID, String title, String start, String end) {
         this.ID = ID;
         this.title = title;
         this.start = start;
         this.end = end;
-        this.note = note;
+        //this.note = note;
     }
 }

@@ -73,7 +73,7 @@ public class Controller1 implements Initializable {
             results = statement.executeQuery(query);
             Meetings meeting;
             while(results.next()){
-                meeting = new Meetings(results.getInt("ID"), results.getString("title"), results.getString("start"), results.getString("end"), results.getString("note"));
+                meeting = new Meetings(results.getInt("meetingID"), results.getString("title"), results.getString("start"), results.getString("end"));
                 meetingList.add(meeting);
             }
         }catch(Exception e){
@@ -89,7 +89,7 @@ public class Controller1 implements Initializable {
         colTitle.setCellValueFactory(new PropertyValueFactory<Meetings, String>("title"));
         colStart.setCellValueFactory(new PropertyValueFactory<Meetings, String>("start"));
         colEnd.setCellValueFactory(new PropertyValueFactory<Meetings, String>("end"));
-        colNote.setCellValueFactory(new PropertyValueFactory<Meetings, String>("note"));
+        //colNote.setCellValueFactory(new PropertyValueFactory<Meetings, String>("note"));
 
         tableMeetings.setItems(list);
     }
@@ -102,7 +102,7 @@ public class Controller1 implements Initializable {
     }
 
     //creates a meeting and calls an update for the table view data if creation was successful
-    public void createMeeting(){
+    public void createMeeting() throws SQLException {
         int modifier = 1;
         switch (checkForm(modifier)){
             //form filled out correctly, meeting created in database, table view updated
@@ -111,10 +111,23 @@ public class Controller1 implements Initializable {
                 labelForm.setTextFill(Color.color(0, 0.9, 0.2));
                 String formattedStartDate = formatStart();
                 String formattedEndDate = formatEnd();
-                //System.out.println(DateTimePicker.InternalConverter.toString(inputStart.getDateTimeValue()));
-                //System.out.println(inputEnd.getDateTimeValue());
-                System.out.println(inputStart.getValue());
-                String query = "INSERT INTO meetinglist (title, start, end, note) VALUES ('" + inputTitle.getText() + "','" + formattedStartDate + "','" + formattedEndDate + "','" + inputNote.getText() + "')";
+                //insert data into meetinglist table (notes addded to different table)
+                String query = "INSERT INTO meetinglist (title, start, end) VALUES ('" + inputTitle.getText() + "','" + formattedStartDate + "','" + formattedEndDate + "')";
+                execute(query);
+
+                //get meeting ID to which the note will be appended (suboptimal solution might change later)
+                Connection conn = getConnection();
+                query = "SELECT meetingID FROM meetinglist WHERE title = '" + inputTitle.getText() + "'";
+                Statement statement;
+                statement = conn.createStatement();
+                ResultSet result;
+                result = statement.executeQuery(query);
+                int currentID = 0;
+                if(result.next()) {
+                    currentID = result.getInt(1);
+                }
+                //insert note with corresponding meeting ID
+                query = "INSERT INTO meetingnotes (noteText, meetingID) VALUES ('" + inputNote.getText() + "','" + currentID + "')";
                 execute(query);
                 break;
             //form not filled out correctly
@@ -136,7 +149,9 @@ public class Controller1 implements Initializable {
             case 0:
                 labelForm.setText("Meeting successfully deleted");
                 labelForm.setTextFill(Color.color(0, 0.9, 0.2));
-                String query = "DELETE FROM meetinglist WHERE ID = " + inputID.getText();
+                String query = "DELETE FROM meetinglist WHERE meetingID = " + inputID.getText();
+                execute(query);
+                query = "DELETE FROM meetingNotes WHERE meetingID = " + inputID.getText();
                 execute(query);
                 showMeetings();
                 break;
@@ -161,8 +176,10 @@ public class Controller1 implements Initializable {
                 labelForm.setTextFill(Color.color(0, 0.9, 0.2));
                 String formattedStartDate = formatStart();
                 String formattedEndDate = formatEnd();
-                String query = "UPDATE meetinglist SET title = '" + inputTitle.getText() + "', start = '" + formattedStartDate + "', end = '" + formattedEndDate + "', note = '" + inputNote.getText() +
-                        "' WHERE ID = " + inputID.getText();
+                String query = "UPDATE meetinglist SET title = '" + inputTitle.getText() + "', start = '" + formattedStartDate + "', end = '" + formattedEndDate +
+                        "' WHERE meetingID = " + inputID.getText();
+                execute(query);
+                query = "UPDATE meetingnotes SET noteText = '" + inputNote.getText() + "' WHERE meetingID = " + inputID.getText();
                 execute(query);
                 showMeetings();
                 break;
@@ -185,7 +202,7 @@ public class Controller1 implements Initializable {
         inputTitle.setText(selectedMeeting.getTitle());
         inputStart.setValue(parseDate(selectedMeeting, selectedMeeting.getStart()));
         inputEnd.setValue(parseDate(selectedMeeting, selectedMeeting.getEnd()));
-        inputNote.setText(selectedMeeting.getNote());
+        //inputNote.setText(selectedMeeting.getNote());
     }
 
     private void execute(String query) {
