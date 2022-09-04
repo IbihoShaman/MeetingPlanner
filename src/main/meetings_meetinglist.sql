@@ -23,14 +23,12 @@ DROP TABLE IF EXISTS `meetinglist`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `meetinglist` (
-  `ID` int NOT NULL AUTO_INCREMENT,
+  `meetingID` int NOT NULL AUTO_INCREMENT,
   `title` varchar(45) NOT NULL,
   `start` varchar(45) NOT NULL,
   `end` varchar(45) NOT NULL,
-  `note` text,
-  PRIMARY KEY (`ID`),
-  UNIQUE KEY `ID_UNIQUE` (`ID`)
-) ENGINE=InnoDB AUTO_INCREMENT=25 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+  PRIMARY KEY (`meetingID`)
+) ENGINE=InnoDB AUTO_INCREMENT=38 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -39,7 +37,7 @@ CREATE TABLE `meetinglist` (
 
 LOCK TABLES `meetinglist` WRITE;
 /*!40000 ALTER TABLE `meetinglist` DISABLE KEYS */;
-INSERT INTO `meetinglist` VALUES (12,'asdasd','04/08/2022','07/08/2022','asdadsd'),(18,'fghjk','01/09/2022','09/09/2022','cvbnm'),(19,'asdf','07/09/2022','17/09/2022','fghjk'),(20,'huhuha','08/09/2022','15/09/2022','blabla baasldl'),(21,'asasasas','17/08/2022','06/10/2022','bbbbbbbbb'),(22,'hhhhhh','08/09/2022','08/09/2022','ssssssssssssssss'),(23,'Hello','15/09/2022','09/09/2022','huhuhahahahahahahaha'),(24,'jojaju','16/09/2022','18/09/2022','');
+INSERT INTO `meetinglist` VALUES (12,'asdasd','04/08/2022','07/08/2022'),(18,'fghjk','01/09/2022','09/09/2022'),(19,'asdf','07/09/2022','17/09/2022'),(20,'huhuha','08/09/2022','15/09/2022'),(21,'asasasas','17/08/2022','06/10/2022'),(22,'hhhhhh','08/09/2022','08/09/2022'),(23,'Hello','15/09/2022','09/09/2022'),(24,'jojaju','16/09/2022','18/09/2022'),(25,'hhhiiiigggd','08/09/2022','16/09/2022'),(26,'ddddddd','17/09/2022','24/09/2022'),(27,'gfgffsdczzzzzz','11/09/2022','16/09/2022'),(28,'bbbbbbbbbbb','28/09/2022','30/09/2022'),(29,'qqqqqqqqqqqqq','09/09/2022','10/09/2022'),(30,'eeeeeeeeeee','15/09/2022','16/09/2022'),(31,'aaaaa','10/09/2022','17/09/2022'),(32,'huhhuhuhuhuh','14/09/2022','18/09/2022'),(33,'jjjjjjjjjjjjjjjjjjjj','14/09/2022','22/09/2022'),(34,'llllllllllllllllllllll','02/09/2022','03/09/2022'),(35,'hhhhhhhhhhhhhhhhhhhhhh','02/09/2022','24/09/2022'),(36,'Test','09/09/2022','17/09/2022'),(37,'Test2','09/09/2022','17/09/2022');
 /*!40000 ALTER TABLE `meetinglist` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
@@ -52,4 +50,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2022-09-03 22:43:06
+-- Dump completed on 2022-09-04 13:05:53
