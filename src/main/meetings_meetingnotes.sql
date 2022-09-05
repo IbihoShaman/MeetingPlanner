@@ -30,7 +30,7 @@ CREATE TABLE `meetingnotes` (
   UNIQUE KEY `noteID_UNIQUE` (`noteID`),
   KEY `meetingID_idx` (`meetingID`),
   CONSTRAINT `meetingID` FOREIGN KEY (`meetingID`) REFERENCES `meetinglist` (`meetingID`)
-) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -39,7 +39,7 @@ CREATE TABLE `meetingnotes` (
 
 LOCK TABLES `meetingnotes` WRITE;
 /*!40000 ALTER TABLE `meetingnotes` DISABLE KEYS */;
-INSERT INTO `meetingnotes` VALUES (1,35,'mnbvcxsadgjj'),(3,36,'this is a test'),(4,37,'this is a test again');
+INSERT INTO `meetingnotes` VALUES (3,36,'this is a test'),(5,38,'this is a test note'),(6,39,'Testing note');
 /*!40000 ALTER TABLE `meetingnotes` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
@@ -52,4 +52,3 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2022-09-04 13:05:53
