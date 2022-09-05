@@ -28,6 +28,8 @@ public class Controller1 implements Initializable {
     @FXML
     private DatePicker inputEnd;
     @FXML
+    private TextArea inputAgenda;
+    @FXML
     private TextArea inputNote;
     @FXML
     private Button buttonCreate;
@@ -103,7 +105,7 @@ public class Controller1 implements Initializable {
 
     //creates a meeting and calls an update for the table view data if creation was successful
     public void createMeeting() throws SQLException {
-        int modifier = 1;
+        String modifier = "create";
         switch (checkForm(modifier)){
             //form filled out correctly, meeting created in database, table view updated
             case 0:
@@ -112,9 +114,8 @@ public class Controller1 implements Initializable {
                 String formattedStartDate = formatStart();
                 String formattedEndDate = formatEnd();
                 //insert data into meetinglist table (notes addded to different table)
-                String query = "INSERT INTO meetinglist (title, start, end) VALUES ('" + inputTitle.getText() + "','" + formattedStartDate + "','" + formattedEndDate + "')";
+                String query = "INSERT INTO meetinglist (title, start, end, agenda) VALUES ('" + inputTitle.getText() + "','" + formattedStartDate + "','" + formattedEndDate + "','" + inputAgenda.getText() + "')";
                 execute(query);
-
                 //get meeting ID to which the note will be appended (suboptimal solution might change later)
                 Connection conn = getConnection();
                 query = "SELECT meetingID FROM meetinglist WHERE title = '" + inputTitle.getText() + "'";
@@ -143,15 +144,15 @@ public class Controller1 implements Initializable {
     }
     //deleted a meeting based on entered meeting ID
     public void deleteMeeting(){
-        int modifier = 2;
+        String modifier = "delete";
         switch (checkForm(modifier)){
             //meeting is deleted from db, table view updated
             case 0:
                 labelForm.setText("Meeting successfully deleted");
                 labelForm.setTextFill(Color.color(0, 0.9, 0.2));
-                String query = "DELETE FROM meetinglist WHERE meetingID = " + inputID.getText();
+                String query = "DELETE FROM meetingNotes WHERE meetingID = " + inputID.getText();
                 execute(query);
-                query = "DELETE FROM meetingNotes WHERE meetingID = " + inputID.getText();
+                query = "DELETE FROM meetinglist WHERE meetingID = " + inputID.getText();
                 execute(query);
                 showMeetings();
                 break;
@@ -168,7 +169,7 @@ public class Controller1 implements Initializable {
     }
     // updates the info of a meeting based on the entered ID and meeting data
     public void updateMeeting(){
-        int modifier = 3;
+        String modifier = "update";
         switch (checkForm(modifier)){
             //filled out correctly, meeting updated, table view updated
             case 0:
@@ -179,8 +180,15 @@ public class Controller1 implements Initializable {
                 String query = "UPDATE meetinglist SET title = '" + inputTitle.getText() + "', start = '" + formattedStartDate + "', end = '" + formattedEndDate +
                         "' WHERE meetingID = " + inputID.getText();
                 execute(query);
-                query = "UPDATE meetingnotes SET noteText = '" + inputNote.getText() + "' WHERE meetingID = " + inputID.getText();
-                execute(query);
+                //checks if agenda input is empty and updates the note if not
+                if(!inputAgenda.getText().isEmpty()) {
+                    query = "UPDATE meetinglist SET agenda = '" + inputAgenda.getText() + "' WHERE meetingID = " + inputID.getText();
+                    execute(query);
+                }
+                /*if(!inputNote.getText().isEmpty()) {
+                    query = "UPDATE meetingnotes SET noteText = '" + inputNote.getText() + "' WHERE meetingID = " + inputID.getText();
+                    execute(query);
+                }*/
                 showMeetings();
                 break;
             //ID not filled in, meeting not updated
@@ -189,12 +197,17 @@ public class Controller1 implements Initializable {
                 labelForm.setTextFill(Color.color(1, 0.1, 0.2 ));
                 break;
             //ID filled but form data missing, meeting not updated
-            default:
+            case -2:
                 labelForm.setText("Error! One or more input fields not filled out");
+                labelForm.setTextFill(Color.color(1, 0.1, 0.2 ));
+                break;
+            default:
+                labelForm.setText("Something went wrong");
                 labelForm.setTextFill(Color.color(1, 0.1, 0.2 ));
                 break;
         }
     }
+
     public void displayMeetingData(){
         Meetings selectedMeeting = tableMeetings.getSelectionModel().getSelectedItem();
 
@@ -218,39 +231,39 @@ public class Controller1 implements Initializable {
         showMeetings();
     }
     
-    public int checkForm(int modifier){
-        int errorCode = 0;
+    public int checkForm(String modifier){
+        int answerCode = 0;
         switch (modifier) {
-            case 1:
+            case "create":
                 if (inputTitle.getText().isEmpty()) {
-                    errorCode--;
+                    answerCode--;
                 } else if (inputStart.getValue() == null) {
-                    errorCode--;
+                    answerCode--;
                 } else if (inputEnd.getValue() == null) {
-                    errorCode--;
+                    answerCode--;
+                } else if (inputAgenda.getText().isEmpty()) {
+                    answerCode--;
                 }
                 break;
-            case 2:
+            case "delete":
                 if(inputID.getText().isEmpty())
-                    errorCode--;
+                    answerCode--;
                 break;
-            case 3:
+            case "update":
                 if(inputID.getText().isEmpty())
-                    errorCode--;
-                if (inputTitle.getText().isEmpty()) {
-                    errorCode -= 2;
+                    answerCode -= 1;
+                else if (inputTitle.getText().isEmpty()) {
+                    answerCode = -2;
                 } else if (inputStart.getValue() == null) {
-                    errorCode -= 2;
+                    answerCode = -2;
                 } else if (inputEnd.getValue() == null) {
-                    errorCode -=2;
+                    answerCode = -2;
                 }
-                return errorCode;
             default:
                 break;
         }
-        return errorCode;
+        return answerCode;
     }
-
 
     public LocalDate parseDate(Meetings meeting, String date){
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
