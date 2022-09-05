@@ -9,6 +9,7 @@ public class Meetings {
     private String title;
     private String start;
     private String end;
+    private String agenda;
     //private String note;
 
 
@@ -20,13 +21,15 @@ public class Meetings {
     public String getEnd() {
         return end;
     }
+    public String getAgenda(){ return agenda; }
     //public String getNote() { return note; }
 
-    public Meetings(Integer ID, String title, String start, String end) {
+    public Meetings(Integer ID, String title, String start, String end, String agenda) {
         this.ID = ID;
         this.title = title;
         this.start = start;
         this.end = end;
+        this.agenda = agenda;
         //this.note = note;
     }
 }

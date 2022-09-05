@@ -20,6 +20,12 @@ public class Controller1 implements Initializable {
     @FXML
     private Label labelForm;
     @FXML
+    private Label labelTitle;
+    @FXML
+    private Label labelStart;
+    @FXML
+    private Label labelEnd;
+    @FXML
     private TextField inputID;
     @FXML
     private TextField inputTitle;
@@ -32,11 +38,9 @@ public class Controller1 implements Initializable {
     @FXML
     private TextArea inputNote;
     @FXML
-    private Button buttonCreate;
+    private TextArea inputNoteOverview;
     @FXML
-    private Button buttonDelete;
-    @FXML
-    private Button buttonUpdate;
+    private TextField inputNoteID;
     @FXML
     private TableView<Meetings> tableMeetings;
     @FXML
@@ -48,7 +52,12 @@ public class Controller1 implements Initializable {
     @FXML
     private TableColumn<Meetings, String> colEnd;
     @FXML
-    private TableColumn<Meetings, String> colNote;
+    private TableView<Meetings> tableNotes;
+    @FXML
+    private TableColumn<Notes, Integer> colNoteID;
+    @FXML
+    private TableColumn<Notes, String> colNoteText;
+
 
     // creates a connection to the database
     public Connection getConnection(){
@@ -75,7 +84,7 @@ public class Controller1 implements Initializable {
             results = statement.executeQuery(query);
             Meetings meeting;
             while(results.next()){
-                meeting = new Meetings(results.getInt("meetingID"), results.getString("title"), results.getString("start"), results.getString("end"));
+                meeting = new Meetings(results.getInt("meetingID"), results.getString("title"), results.getString("start"), results.getString("end"), results.getString("agenda"));
                 meetingList.add(meeting);
             }
         }catch(Exception e){
@@ -215,7 +224,11 @@ public class Controller1 implements Initializable {
         inputTitle.setText(selectedMeeting.getTitle());
         inputStart.setValue(parseDate(selectedMeeting, selectedMeeting.getStart()));
         inputEnd.setValue(parseDate(selectedMeeting, selectedMeeting.getEnd()));
-        //inputNote.setText(selectedMeeting.getNote());
+        inputAgenda.setText(selectedMeeting.getAgenda());
+
+        labelTitle.setText("Meeting title: " + selectedMeeting.getTitle());
+        labelStart.setText("From : " + selectedMeeting.getStart());
+        labelEnd.setText("To : " + selectedMeeting.getEnd());
     }
 
     private void execute(String query) {
@@ -230,8 +243,18 @@ public class Controller1 implements Initializable {
         System.out.println("Table populated");
         showMeetings();
     }
+    public void addNote(){
+
+    }
+    public void updateNote(){
+
+    }
+    public void deleteNote(){
+
+    }
+
     
-    public int checkForm(String modifier){
+    private int checkForm(String modifier){
         int answerCode = 0;
         switch (modifier) {
             case "create":
@@ -264,6 +287,7 @@ public class Controller1 implements Initializable {
         }
         return answerCode;
     }
+
 
     public LocalDate parseDate(Meetings meeting, String date){
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
