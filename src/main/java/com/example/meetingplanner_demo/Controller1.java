@@ -149,15 +149,12 @@ public class Controller1 implements Initializable {
         switch (checkForm(modifier)){
             //form filled out correctly, meeting created in database, table view updated
             case 0:
-                labelForm.setText("Meeting successfully created");
-                labelForm.setTextFill(Color.color(0, 0.9, 0.2));
                 String formattedStartDate = formatStart();
                 String formattedEndDate = formatEnd();
                 //insert data into meetinglist table (notes addded to different table)
                 String query = "INSERT INTO meetinglist (title, start, end, agenda) VALUES ('" + inputTitle.getText() + "','" + formattedStartDate + "','" + formattedEndDate + "','" + inputAgenda.getText() + "')";
                 execute(query);
-
-                ////Adding appended note to meetingnotes table
+                ////Adding appended note to meetingNotes table/////
                 //get meeting ID to which the note will be appended (suboptimal solution might change later)
                 Connection conn = getConnection();
                 query = "SELECT meetingID FROM meetinglist WHERE title = '" + inputTitle.getText() + "'";
@@ -172,35 +169,12 @@ public class Controller1 implements Initializable {
                 //insert note with corresponding meeting ID
                 query = "INSERT INTO meetingnotes (noteText, meetingID) VALUES ('" + inputNote.getText() + "','" + currentID + "')";
                 execute(query);
+                labelForm.setText("Meeting successfully created");
+                labelForm.setTextFill(Color.color(0, 0.9, 0.2));
                 break;
             //form not filled out correctly
             case -1:
                 labelForm.setText("Error! One or more fields are not filled out");
-                labelForm.setTextFill(Color.color(1, 0.1, 0.2 ));
-                break;
-            default:
-                labelForm.setText("Something went wrong");
-                labelForm.setTextFill(Color.color(1, 0.1, 0.2 ));
-                break;
-        }
-    }
-    //deleted a meeting based on entered meeting ID
-    public void deleteMeeting(){
-        String modifier = "delete";
-        switch (checkForm(modifier)){
-            //meeting is deleted from db, table view updated
-            case 0:
-                labelForm.setText("Meeting successfully deleted");
-                labelForm.setTextFill(Color.color(0, 0.9, 0.2));
-                String query = "DELETE FROM meetingNotes WHERE meetingID = " + inputID.getText();
-                execute(query);
-                query = "DELETE FROM meetinglist WHERE meetingID = " + inputID.getText();
-                execute(query);
-                showMeetings();
-                break;
-            //user did not fill ID input, meeting is not deleted
-            case -1:
-                labelForm.setText("Error! ID field not filled out");
                 labelForm.setTextFill(Color.color(1, 0.1, 0.2 ));
                 break;
             default:
@@ -215,18 +189,14 @@ public class Controller1 implements Initializable {
         switch (checkForm(modifier)){
             //filled out correctly, meeting updated, table view updated
             case 0:
-                labelForm.setText("Meeting successfully updated");
-                labelForm.setTextFill(Color.color(0, 0.9, 0.2));
                 String formattedStartDate = formatStart();
                 String formattedEndDate = formatEnd();
                 String query = "UPDATE meetinglist SET title = '" + inputTitle.getText() + "', start = '" + formattedStartDate + "', end = '" + formattedEndDate + "', agenda = '" + inputAgenda.getText() +
                         "' WHERE meetingID = " + inputID.getText();
                 execute(query);
-                /*if(!inputNote.getText().isEmpty()) {
-                    query = "UPDATE meetingnotes SET noteText = '" + inputNote.getText() + "' WHERE meetingID = " + inputID.getText();
-                    execute(query);
-                }*/
                 showMeetings();
+                labelForm.setText("Meeting successfully updated");
+                labelForm.setTextFill(Color.color(0, 0.9, 0.2));
                 break;
             //ID not filled in, meeting not updated
             case -1:
@@ -236,6 +206,31 @@ public class Controller1 implements Initializable {
             //ID filled but form data missing, meeting not updated
             case -2:
                 labelForm.setText("Error! One or more input fields not filled out");
+                labelForm.setTextFill(Color.color(1, 0.1, 0.2 ));
+                break;
+            default:
+                labelForm.setText("Something went wrong");
+                labelForm.setTextFill(Color.color(1, 0.1, 0.2 ));
+                break;
+        }
+    }
+    //deleted a meeting based on entered meeting ID
+    public void deleteMeeting(){
+        String modifier = "delete";
+        switch (checkForm(modifier)){
+            //meeting is deleted from db, table view updated
+            case 0:
+                String query = "DELETE FROM meetingNotes WHERE meetingID = " + inputID.getText();
+                execute(query);
+                query = "DELETE FROM meetinglist WHERE meetingID = " + inputID.getText();
+                execute(query);
+                showMeetings();
+                labelForm.setText("Meeting successfully deleted");
+                labelForm.setTextFill(Color.color(0, 0.9, 0.2));
+                break;
+            //user did not fill ID input, meeting is not deleted
+            case -1:
+                labelForm.setText("Error! ID field not filled out");
                 labelForm.setTextFill(Color.color(1, 0.1, 0.2 ));
                 break;
             default:
@@ -303,15 +298,68 @@ public class Controller1 implements Initializable {
                 labelNoteOverview.setTextFill(Color.color(1, 0.1, 0.2 ));
                 break;
             default:
+                labelNoteOverview.setText("Something went wrong");
+                labelNoteOverview.setTextFill(Color.color(1, 0.1, 0.2 ));
                 break;
         }
 
     }
     public void updateNote(){
-
+        String modifier = "updateNote";
+        switch (checkForm(modifier)){
+            case 0:
+                String query = "UPDATE meetingnotes SET noteText = '" + inputNoteOverview.getText() +
+                        "' WHERE noteID = " + inputNoteID.getText();
+                execute(query);
+                labelNoteOverview.setText("Note ID: " + inputNoteID.getText() + " updated");
+                labelNoteOverview.setTextFill(Color.color(0, 0.9, 0.2));
+                showNotes(selectedMeeting.getID());
+                break;
+            case -1:
+                labelNoteOverview.setText("No meeting selected, select a meeting first");
+                labelNoteOverview.setTextFill(Color.color(1, 0.1, 0.2 ));
+                break;
+            case -2:
+                labelNoteOverview.setText("Input field is empty, cannot update note");
+                labelNoteOverview.setTextFill(Color.color(1, 0.1, 0.2 ));
+                break;
+            case -3:
+                labelNoteOverview.setText("Max length of note is 200 characters");
+                labelNoteOverview.setTextFill(Color.color(1, 0.1, 0.2 ));
+                break;
+            case -4:
+                labelNoteOverview.setText("ID input is empty, enter correct noteID first");
+                labelNoteOverview.setTextFill(Color.color(1, 0.1, 0.2 ));
+                break;
+            default:
+                labelNoteOverview.setText("Something went wrong");
+                labelNoteOverview.setTextFill(Color.color(1, 0.1, 0.2 ));
+                break;
+        }
     }
     public void deleteNote(){
-
+        String modifier = "deleteNote";
+        switch (checkForm(modifier)){
+            case 0:
+                String query = "DELETE FROM meetingnotes WHERE noteID = " + inputNoteID.getText();
+                execute(query);
+                labelNoteOverview.setText("Note with ID: " + inputNoteID.getText() + " deleted: " + selectedMeeting.getID());
+                labelNoteOverview.setTextFill(Color.color(0, 0.9, 0.2));
+                showNotes(selectedMeeting.getID());
+                break;
+            case -1:
+                labelNoteOverview.setText("No meeting selected, select a meeting first");
+                labelNoteOverview.setTextFill(Color.color(1, 0.1, 0.2 ));
+                break;
+            case -2:
+                labelNoteOverview.setText("ID input is empty, enter correct noteID first");
+                labelNoteOverview.setTextFill(Color.color(1, 0.1, 0.2 ));
+                break;
+            default:
+                labelNoteOverview.setText("Something went wrong");
+                labelNoteOverview.setTextFill(Color.color(1, 0.1, 0.2 ));
+                break;
+        }
     }
 
 
@@ -335,22 +383,22 @@ public class Controller1 implements Initializable {
         switch (modifier) {
             case "create":
                 if (inputTitle.getText().isEmpty()) {
-                    answerCode--;
+                    answerCode = -1;
                 } else if (inputStart.getValue() == null) {
-                    answerCode--;
+                    answerCode = -1;
                 } else if (inputEnd.getValue() == null) {
-                    answerCode--;
+                    answerCode = -1;
                 } else if (inputAgenda.getText().isEmpty()) {
-                    answerCode--;
+                    answerCode = -1;
                 }
                 break;
             case "delete":
                 if(inputID.getText().isEmpty())
-                    answerCode--;
+                    answerCode = -1;
                 break;
             case "update":
                 if(inputID.getText().isEmpty())
-                    answerCode -= 1;
+                    answerCode = -1;
                 else if (inputTitle.getText().isEmpty()) {
                     answerCode = -2;
                 } else if (inputStart.getValue() == null) {
@@ -368,6 +416,25 @@ public class Controller1 implements Initializable {
                 } else if(inputNoteOverview.getText().length() > 200){
                     answerCode = -3;
                 }
+                break;
+            case "updateNote":
+                if(selectedMeeting == null){
+                    answerCode = -1;
+                } else if(inputNoteOverview.getText().isEmpty()){
+                    answerCode = -2;
+                } else if(inputNoteOverview.getText().length() > 200){
+                    answerCode = -3;
+                } else if(inputNoteID.getText().isEmpty()){
+                    answerCode = -4;
+                }
+                break;
+            case "deleteNote":
+                if(selectedMeeting == null){
+                    answerCode = -1;
+                } else if(inputNoteID.getText().isEmpty()){
+                    answerCode = -2;
+                }
+                break;
             default:
                 break;
         }
