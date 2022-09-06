@@ -12,9 +12,7 @@ import java.sql.*;
 import java.net.URL;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.Date;
 import java.util.ResourceBundle;
-import java.util.Scanner;
 
 public class Controller1 implements Initializable {
     @FXML
@@ -52,7 +50,9 @@ public class Controller1 implements Initializable {
     @FXML
     private TableColumn<Meetings, String> colEnd;
     @FXML
-    private TableView<Meetings> tableNotes;
+    private TableView<Notes> tableNotes;
+    @FXML
+    private TableColumn<Notes, Integer> colParentID;
     @FXML
     private TableColumn<Notes, Integer> colNoteID;
     @FXML
@@ -93,6 +93,37 @@ public class Controller1 implements Initializable {
         return meetingList;
     }
 
+    //reads all note entries in the database with correct parent ID into an observable list and returns it
+    public ObservableList<Notes> getNotesList(int parentID){
+        ObservableList<Notes> notesList = FXCollections.observableArrayList();
+        Connection conn = getConnection();
+        String query = "SELECT * FROM meetingnotes WHERE meetingID = " + parentID;
+        Statement statement;
+        ResultSet results;
+        try{
+            statement = conn.createStatement();
+            results = statement.executeQuery(query);
+            Notes note;
+            while(results.next()){
+                //System.out.println("Note Text -----> " + results.getString("noteText"));
+                note = new Notes(results.getInt("noteID"), results.getInt("meetingID"), results.getString("noteText"));
+                notesList.add(note);
+            }
+        }catch(Exception e){
+            e.printStackTrace();
+        }
+        return notesList;
+    }
+
+    //populates the table view on launch
+    @Override
+    public void initialize(URL url, ResourceBundle resourceBundle) {
+        //getConnection();
+        showMeetings();
+    }
+
+///////////////////////////////////Meeting functionality/////////////////////////////////////
+
     //prints the data of all meetings from the observable list into the correct columns of the table view
     public void showMeetings(){
         ObservableList<Meetings> list = getMeetingList();
@@ -105,12 +136,6 @@ public class Controller1 implements Initializable {
         tableMeetings.setItems(list);
     }
 
-    //populates the table view on launch
-    @Override
-    public void initialize(URL url, ResourceBundle resourceBundle) {
-        //getConnection();
-        showMeetings();
-    }
 
     //creates a meeting and calls an update for the table view data if creation was successful
     public void createMeeting() throws SQLException {
@@ -222,14 +247,40 @@ public class Controller1 implements Initializable {
 
         inputID.setText("" + selectedMeeting.getID());
         inputTitle.setText(selectedMeeting.getTitle());
-        inputStart.setValue(parseDate(selectedMeeting, selectedMeeting.getStart()));
-        inputEnd.setValue(parseDate(selectedMeeting, selectedMeeting.getEnd()));
+        inputStart.setValue(parseDate(selectedMeeting.getStart()));
+        inputEnd.setValue(parseDate(selectedMeeting.getEnd()));
         inputAgenda.setText(selectedMeeting.getAgenda());
 
         labelTitle.setText("Meeting title: " + selectedMeeting.getTitle());
         labelStart.setText("From : " + selectedMeeting.getStart());
         labelEnd.setText("To : " + selectedMeeting.getEnd());
+
+        showNotes(selectedMeeting.getID());
     }
+
+////////////////////////Note functionality///////////////////////////
+
+    public void showNotes(int parentID){
+        ObservableList<Notes> list = getNotesList(parentID);
+        colNoteID.setCellValueFactory(new PropertyValueFactory<Notes, Integer>("noteID"));
+        colParentID.setCellValueFactory(new PropertyValueFactory<Notes, Integer>("parentMeetingID"));
+        colNoteText.setCellValueFactory(new PropertyValueFactory<Notes, String>("noteText"));
+
+        tableNotes.setItems(list);
+    }
+
+    public void addNote(){
+
+    }
+    public void updateNote(){
+
+    }
+    public void deleteNote(){
+
+    }
+
+
+///////////////////////////////Additional funtionality//////////////////////////////////////
 
     private void execute(String query) {
         Connection connection = getConnection();
@@ -243,16 +294,6 @@ public class Controller1 implements Initializable {
         System.out.println("Table populated");
         showMeetings();
     }
-    public void addNote(){
-
-    }
-    public void updateNote(){
-
-    }
-    public void deleteNote(){
-
-    }
-
     
     private int checkForm(String modifier){
         int answerCode = 0;
@@ -288,8 +329,7 @@ public class Controller1 implements Initializable {
         return answerCode;
     }
 
-
-    public LocalDate parseDate(Meetings meeting, String date){
+    public LocalDate parseDate(String date){
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
         return LocalDate.parse(date, formatter);
     }
