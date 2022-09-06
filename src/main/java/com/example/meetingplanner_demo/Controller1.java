@@ -24,6 +24,8 @@ public class Controller1 implements Initializable {
     @FXML
     private Label labelEnd;
     @FXML
+    private Label labelAgenda;
+    @FXML
     private TextField inputID;
     @FXML
     private TextField inputTitle;
@@ -211,14 +213,9 @@ public class Controller1 implements Initializable {
                 labelForm.setTextFill(Color.color(0, 0.9, 0.2));
                 String formattedStartDate = formatStart();
                 String formattedEndDate = formatEnd();
-                String query = "UPDATE meetinglist SET title = '" + inputTitle.getText() + "', start = '" + formattedStartDate + "', end = '" + formattedEndDate +
+                String query = "UPDATE meetinglist SET title = '" + inputTitle.getText() + "', start = '" + formattedStartDate + "', end = '" + formattedEndDate + "', agenda = '" + inputAgenda.getText() +
                         "' WHERE meetingID = " + inputID.getText();
                 execute(query);
-                //checks if agenda input is empty and updates the note if not
-                if(!inputAgenda.getText().isEmpty()) {
-                    query = "UPDATE meetinglist SET agenda = '" + inputAgenda.getText() + "' WHERE meetingID = " + inputID.getText();
-                    execute(query);
-                }
                 /*if(!inputNote.getText().isEmpty()) {
                     query = "UPDATE meetingnotes SET noteText = '" + inputNote.getText() + "' WHERE meetingID = " + inputID.getText();
                     execute(query);
@@ -251,9 +248,10 @@ public class Controller1 implements Initializable {
         inputEnd.setValue(parseDate(selectedMeeting.getEnd()));
         inputAgenda.setText(selectedMeeting.getAgenda());
 
-        labelTitle.setText("Meeting title: " + selectedMeeting.getTitle());
-        labelStart.setText("From : " + selectedMeeting.getStart());
-        labelEnd.setText("To : " + selectedMeeting.getEnd());
+        labelTitle.setText("TITLE : " + selectedMeeting.getTitle());
+        labelStart.setText("FROM : " + selectedMeeting.getStart());
+        labelEnd.setText("TO : " + selectedMeeting.getEnd());
+        labelAgenda.setText("AGENDA : \n" + selectedMeeting.getAgenda());
 
         showNotes(selectedMeeting.getID());
     }
@@ -321,6 +319,8 @@ public class Controller1 implements Initializable {
                 } else if (inputStart.getValue() == null) {
                     answerCode = -2;
                 } else if (inputEnd.getValue() == null) {
+                    answerCode = -2;
+                } else if (inputAgenda.getText() == null) {
                     answerCode = -2;
                 }
             default:
