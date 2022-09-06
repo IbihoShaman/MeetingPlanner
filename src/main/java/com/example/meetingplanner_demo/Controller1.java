@@ -26,6 +26,8 @@ public class Controller1 implements Initializable {
     @FXML
     private Label labelAgenda;
     @FXML
+    private Label labelNoteOverview;
+    @FXML
     private TextField inputID;
     @FXML
     private TextField inputTitle;
@@ -59,6 +61,8 @@ public class Controller1 implements Initializable {
     private TableColumn<Notes, Integer> colNoteID;
     @FXML
     private TableColumn<Notes, String> colNoteText;
+
+    Meetings selectedMeeting;
 
 
     // creates a connection to the database
@@ -152,6 +156,8 @@ public class Controller1 implements Initializable {
                 //insert data into meetinglist table (notes addded to different table)
                 String query = "INSERT INTO meetinglist (title, start, end, agenda) VALUES ('" + inputTitle.getText() + "','" + formattedStartDate + "','" + formattedEndDate + "','" + inputAgenda.getText() + "')";
                 execute(query);
+
+                ////Adding appended note to meetingnotes table
                 //get meeting ID to which the note will be appended (suboptimal solution might change later)
                 Connection conn = getConnection();
                 query = "SELECT meetingID FROM meetinglist WHERE title = '" + inputTitle.getText() + "'";
@@ -240,7 +246,7 @@ public class Controller1 implements Initializable {
     }
 
     public void displayMeetingData(){
-        Meetings selectedMeeting = tableMeetings.getSelectionModel().getSelectedItem();
+        selectedMeeting = tableMeetings.getSelectionModel().getSelectedItem();
 
         inputID.setText("" + selectedMeeting.getID());
         inputTitle.setText(selectedMeeting.getTitle());
@@ -267,7 +273,38 @@ public class Controller1 implements Initializable {
         tableNotes.setItems(list);
     }
 
+    public void displayNoteData(){
+        Notes selectedNote = tableNotes.getSelectionModel().getSelectedItem();
+
+        inputNoteID.setText("" + selectedNote.getNoteID());
+        inputNoteOverview.setText(selectedNote.getNoteText());
+    }
+
     public void addNote(){
+        String modifier = "createNote";
+        switch (checkForm(modifier)){
+            case 0:
+                String query = "INSERT INTO meetingnotes (meetingID, noteText) VALUES ('" + selectedMeeting.getID() + "','" + inputNoteOverview.getText() + "')";
+                execute(query);
+                labelNoteOverview.setText("Note added to meeting ID: " + selectedMeeting.getID());
+                labelNoteOverview.setTextFill(Color.color(0, 0.9, 0.2));
+                showNotes(selectedMeeting.getID());
+                break;
+            case -1:
+                labelNoteOverview.setText("No meeting selected, select a meeting first");
+                labelNoteOverview.setTextFill(Color.color(1, 0.1, 0.2 ));
+                 break;
+            case -2:
+                labelNoteOverview.setText("Input field is empty, cannot add note");
+                labelNoteOverview.setTextFill(Color.color(1, 0.1, 0.2 ));
+                break;
+            case -3:
+                labelNoteOverview.setText("Max length of note is 200 characters");
+                labelNoteOverview.setTextFill(Color.color(1, 0.1, 0.2 ));
+                break;
+            default:
+                break;
+        }
 
     }
     public void updateNote(){
@@ -322,6 +359,14 @@ public class Controller1 implements Initializable {
                     answerCode = -2;
                 } else if (inputAgenda.getText() == null) {
                     answerCode = -2;
+                }
+            case "createNote":
+                if(selectedMeeting == null){
+                    answerCode = -1;
+                } else if(inputNoteOverview.getText().isEmpty()){
+                    answerCode = -2;
+                } else if(inputNoteOverview.getText().length() > 200){
+                    answerCode = -3;
                 }
             default:
                 break;

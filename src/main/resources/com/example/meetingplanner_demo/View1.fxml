@@ -148,18 +148,18 @@
                   <Insets />
                </opaqueInsets>
             </HBox>
-            <HBox prefHeight="197.0" prefWidth="726.0" spacing="20.0">
+            <HBox prefHeight="219.0" prefWidth="806.0" spacing="20.0">
                <children>
-                  <TableView fx:id="tableNotes" prefHeight="196.0" prefWidth="430.0">
+                  <TableView fx:id="tableNotes" onMouseClicked="#displayNoteData" prefHeight="196.0" prefWidth="430.0">
                     <columns>
                         <TableColumn fx:id="colParentID" prefWidth="76.000030875206" text="MeetingID" />
                       <TableColumn fx:id="colNoteID" prefWidth="57.600006103515625" text="NoteID" />
                       <TableColumn fx:id="colNoteText" prefWidth="294.4" text="Text" />
                     </columns>
                   </TableView>
-                  <VBox prefHeight="172.0" prefWidth="346.0" spacing="10.0">
+                  <VBox prefHeight="153.0" prefWidth="346.0" spacing="10.0">
                      <children>
-                        <TextArea fx:id="inputNoteOverview" prefHeight="118.0" prefWidth="282.0" />
+                        <TextArea fx:id="inputNoteOverview" prefHeight="70.0" prefWidth="346.0" />
                         <HBox prefHeight="33.0" prefWidth="346.0" spacing="10.0">
                            <children>
                               <Button fx:id="buttonAddNote" mnemonicParsing="false" onAction="#addNote" prefHeight="30.0" prefWidth="101.0" text="Add Note">
@@ -191,9 +191,10 @@
                               <TextField fx:id="inputNoteID" prefHeight="26.0" prefWidth="41.0" />
                            </children>
                         </HBox>
-                        <HBox prefHeight="38.0" prefWidth="346.0">
+                        <HBox prefHeight="50.0" prefWidth="346.0">
                            <children>
-                              <Button fx:id="buttonDeleteNote" mnemonicParsing="false" onAction="#deleteNote" prefHeight="26.0" prefWidth="118.0" text="Delete Note">
+                              <Label fx:id="labelNoteOverview" prefHeight="50.0" prefWidth="267.0" textAlignment="CENTER" />
+                              <Button fx:id="buttonDeleteNote" mnemonicParsing="false" onAction="#deleteNote" prefHeight="28.0" prefWidth="130.0" text="Delete Note">
                                  <graphic>
                                     <ImageView fitHeight="20.0" fitWidth="22.0" pickOnBounds="true" preserveRatio="true">
                                        <image>
@@ -203,9 +204,6 @@
                                  </graphic>
                               </Button>
                            </children>
-                           <padding>
-                              <Insets left="240.0" />
-                           </padding>
                         </HBox>
                      </children>
                   </VBox>
