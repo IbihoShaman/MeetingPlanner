@@ -75,27 +75,20 @@ public class Controller1 implements Initializable {
     @FXML
     private Button buttonDeleteNote;
 
-
+    DB database = new DB();
     private Meetings selectedMeeting;
 
-
-    // creates a connection to the database
-    public Connection getConnection(){
-        Connection conn;
-        try{
-            conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/meetings", "root", "root");
-            System.out.println("Connected to database");
-            return conn;
-        }catch (Exception e){
-            System.out.println(e.getMessage());
-            return null;
-        }
+    //populates the table view on launch
+    @Override
+    public void initialize(URL url, ResourceBundle resourceBundle) {
+        //getConnection();
+        showMeetings();
     }
 
     //reads all meeting entries in the database into an observable list and returns it
     public ObservableList<Meetings> getMeetingList(){
         ObservableList<Meetings> meetingList = FXCollections.observableArrayList();
-        Connection conn = getConnection();
+        Connection conn = database.getConnection();
         String query = "SELECT * FROM meetinglist";
         Statement statement;
         ResultSet results;
@@ -116,7 +109,7 @@ public class Controller1 implements Initializable {
     //reads all note entries in the database with correct parent ID into an observable list and returns it
     public ObservableList<Notes> getNotesList(int parentID){
         ObservableList<Notes> notesList = FXCollections.observableArrayList();
-        Connection conn = getConnection();
+        Connection conn = database.getConnection();
         String query = "SELECT * FROM meetingnotes WHERE meetingID = " + parentID;
         Statement statement;
         ResultSet results;
@@ -134,14 +127,6 @@ public class Controller1 implements Initializable {
         }
         return notesList;
     }
-
-    //populates the table view on launch
-    @Override
-    public void initialize(URL url, ResourceBundle resourceBundle) {
-        //getConnection();
-        showMeetings();
-    }
-
 ///////////////////////////////////Meeting functionality/////////////////////////////////////
 
     //prints the data of all meetings from the observable list into the correct columns of the table view
@@ -170,7 +155,7 @@ public class Controller1 implements Initializable {
                 execute(query);
                 ////Adding appended note to meetingNotes table/////
                 //get meeting ID to which the note will be appended (suboptimal solution might change later)
-                Connection conn = getConnection();
+                Connection conn = database.getConnection();
                 query = "SELECT meetingID FROM meetinglist WHERE title = '" + inputTitle.getText() + "'";
                 Statement statement;
                 statement = conn.createStatement();
@@ -392,7 +377,7 @@ public class Controller1 implements Initializable {
 ///////////////////////////////Additional functionality//////////////////////////////////////
 
     private void execute(String query) {
-        Connection connection = getConnection();
+        Connection connection = database.getConnection();
         Statement statement;
         try {
             statement = connection.createStatement();
@@ -471,7 +456,7 @@ public class Controller1 implements Initializable {
 
     public boolean checkRows(String query) throws SQLException {
         int rows;
-        Connection conn = getConnection();
+        Connection conn = database.getConnection();
         Statement statement;
         statement = conn.createStatement();
         rows = statement.executeUpdate(query);
