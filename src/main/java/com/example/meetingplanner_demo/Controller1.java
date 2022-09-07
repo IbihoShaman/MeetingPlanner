@@ -61,8 +61,22 @@ public class Controller1 implements Initializable {
     private TableColumn<Notes, Integer> colNoteID;
     @FXML
     private TableColumn<Notes, String> colNoteText;
+    //buttons
+    @FXML
+    private Button buttonCreate;
+    @FXML
+    private Button buttonUpdate;
+    @FXML
+    private Button buttonDelete;
+    @FXML
+    private Button buttonAddNote;
+    @FXML
+    private Button buttonUpdateNote;
+    @FXML
+    private Button buttonDeleteNote;
 
-    Meetings selectedMeeting;
+
+    private Meetings selectedMeeting;
 
 
     // creates a connection to the database
@@ -133,10 +147,10 @@ public class Controller1 implements Initializable {
     //prints the data of all meetings from the observable list into the correct columns of the table view
     public void showMeetings(){
         ObservableList<Meetings> list = getMeetingList();
-        colID.setCellValueFactory(new PropertyValueFactory<Meetings, Integer>("ID"));
-        colTitle.setCellValueFactory(new PropertyValueFactory<Meetings, String>("title"));
-        colStart.setCellValueFactory(new PropertyValueFactory<Meetings, String>("start"));
-        colEnd.setCellValueFactory(new PropertyValueFactory<Meetings, String>("end"));
+        colID.setCellValueFactory(new PropertyValueFactory<>("ID"));
+        colTitle.setCellValueFactory(new PropertyValueFactory<>("title"));
+        colStart.setCellValueFactory(new PropertyValueFactory<>("start"));
+        colEnd.setCellValueFactory(new PropertyValueFactory<>("end"));
         //colNote.setCellValueFactory(new PropertyValueFactory<Meetings, String>("note"));
 
         tableMeetings.setItems(list);
@@ -145,13 +159,13 @@ public class Controller1 implements Initializable {
 
     //creates a meeting and calls an update for the table view data if creation was successful
     public void createMeeting() throws SQLException {
-        String modifier = "create";
-        switch (checkForm(modifier)){
+        String modifier = "createMeeting";
+        switch (formValidator(modifier)){
             //form filled out correctly, meeting created in database, table view updated
             case 0:
                 String formattedStartDate = formatStart();
                 String formattedEndDate = formatEnd();
-                //insert data into meetinglist table (notes addded to different table)
+                //insert data into meetinglist table (notes added to different table)
                 String query = "INSERT INTO meetinglist (title, start, end, agenda) VALUES ('" + inputTitle.getText() + "','" + formattedStartDate + "','" + formattedEndDate + "','" + inputAgenda.getText() + "')";
                 execute(query);
                 ////Adding appended note to meetingNotes table/////
@@ -177,6 +191,10 @@ public class Controller1 implements Initializable {
                 labelForm.setText("Error! One or more fields are not filled out");
                 labelForm.setTextFill(Color.color(1, 0.1, 0.2 ));
                 break;
+            case -2:
+                labelForm.setText("Error! ID field filled incorrectly");
+                labelForm.setTextFill(Color.color(1, 0.1, 0.2 ));
+                break;
             default:
                 labelForm.setText("Something went wrong");
                 labelForm.setTextFill(Color.color(1, 0.1, 0.2 ));
@@ -184,23 +202,27 @@ public class Controller1 implements Initializable {
         }
     }
     // updates the info of a meeting based on the entered ID and meeting data
-    public void updateMeeting(){
-        String modifier = "update";
-        switch (checkForm(modifier)){
+    public void updateMeeting() throws SQLException {
+        String modifier = "updateMeeting";
+        switch (formValidator(modifier)){
             //filled out correctly, meeting updated, table view updated
             case 0:
                 String formattedStartDate = formatStart();
                 String formattedEndDate = formatEnd();
                 String query = "UPDATE meetinglist SET title = '" + inputTitle.getText() + "', start = '" + formattedStartDate + "', end = '" + formattedEndDate + "', agenda = '" + inputAgenda.getText() +
                         "' WHERE meetingID = " + inputID.getText();
-                execute(query);
-                showMeetings();
-                labelForm.setText("Meeting successfully updated");
-                labelForm.setTextFill(Color.color(0, 0.9, 0.2));
+                if(!checkRows(query)){
+                    labelForm.setText("No meeting with given ID found");
+                    labelForm.setTextFill(Color.color(1, 0.1, 0.2 ));
+                } else {
+                    showMeetings();
+                    labelForm.setText("Meeting successfully updated");
+                    labelForm.setTextFill(Color.color(0, 0.9, 0.2));
+                }
                 break;
             //ID not filled in, meeting not updated
             case -1:
-                labelForm.setText("Error! ID field not filled out");
+                labelForm.setText("Error! ID field filled incorrectly");
                 labelForm.setTextFill(Color.color(1, 0.1, 0.2 ));
                 break;
             //ID filled but form data missing, meeting not updated
@@ -216,8 +238,8 @@ public class Controller1 implements Initializable {
     }
     //deleted a meeting based on entered meeting ID
     public void deleteMeeting(){
-        String modifier = "delete";
-        switch (checkForm(modifier)){
+        String modifier = "deleteMeeting";
+        switch (formValidator(modifier)){
             //meeting is deleted from db, table view updated
             case 0:
                 String query = "DELETE FROM meetingNotes WHERE meetingID = " + inputID.getText();
@@ -230,7 +252,7 @@ public class Controller1 implements Initializable {
                 break;
             //user did not fill ID input, meeting is not deleted
             case -1:
-                labelForm.setText("Error! ID field not filled out");
+                labelForm.setText("Error! ID field filled incorrectly");
                 labelForm.setTextFill(Color.color(1, 0.1, 0.2 ));
                 break;
             default:
@@ -261,9 +283,9 @@ public class Controller1 implements Initializable {
 
     public void showNotes(int parentID){
         ObservableList<Notes> list = getNotesList(parentID);
-        colNoteID.setCellValueFactory(new PropertyValueFactory<Notes, Integer>("noteID"));
-        colParentID.setCellValueFactory(new PropertyValueFactory<Notes, Integer>("parentMeetingID"));
-        colNoteText.setCellValueFactory(new PropertyValueFactory<Notes, String>("noteText"));
+        colNoteID.setCellValueFactory(new PropertyValueFactory<>("noteID"));
+        colParentID.setCellValueFactory(new PropertyValueFactory<>("parentMeetingID"));
+        colNoteText.setCellValueFactory(new PropertyValueFactory<>("noteText"));
 
         tableNotes.setItems(list);
     }
@@ -277,7 +299,7 @@ public class Controller1 implements Initializable {
 
     public void addNote(){
         String modifier = "createNote";
-        switch (checkForm(modifier)){
+        switch (formValidator(modifier)){
             case 0:
                 String query = "INSERT INTO meetingnotes (meetingID, noteText) VALUES ('" + selectedMeeting.getID() + "','" + inputNoteOverview.getText() + "')";
                 execute(query);
@@ -304,16 +326,20 @@ public class Controller1 implements Initializable {
         }
 
     }
-    public void updateNote(){
+    public void updateNote() throws SQLException {
         String modifier = "updateNote";
-        switch (checkForm(modifier)){
+        switch (formValidator(modifier)){
             case 0:
                 String query = "UPDATE meetingnotes SET noteText = '" + inputNoteOverview.getText() +
                         "' WHERE noteID = " + inputNoteID.getText();
-                execute(query);
-                labelNoteOverview.setText("Note ID: " + inputNoteID.getText() + " updated");
-                labelNoteOverview.setTextFill(Color.color(0, 0.9, 0.2));
-                showNotes(selectedMeeting.getID());
+                if(!checkRows(query)){
+                    labelNoteOverview.setText("No note with given ID found");
+                    labelNoteOverview.setTextFill(Color.color(1, 0.1, 0.2 ));
+                } else {
+                    labelNoteOverview.setText("Note ID: " + inputNoteID.getText() + " updated");
+                    labelNoteOverview.setTextFill(Color.color(0, 0.9, 0.2));
+                    showNotes(selectedMeeting.getID());
+                }
                 break;
             case -1:
                 labelNoteOverview.setText("No meeting selected, select a meeting first");
@@ -339,7 +365,7 @@ public class Controller1 implements Initializable {
     }
     public void deleteNote(){
         String modifier = "deleteNote";
-        switch (checkForm(modifier)){
+        switch (formValidator(modifier)){
             case 0:
                 String query = "DELETE FROM meetingnotes WHERE noteID = " + inputNoteID.getText();
                 execute(query);
@@ -352,7 +378,7 @@ public class Controller1 implements Initializable {
                 labelNoteOverview.setTextFill(Color.color(1, 0.1, 0.2 ));
                 break;
             case -2:
-                labelNoteOverview.setText("ID input is empty, enter correct noteID first");
+                labelNoteOverview.setText("ID input filled incorrectly");
                 labelNoteOverview.setTextFill(Color.color(1, 0.1, 0.2 ));
                 break;
             default:
@@ -363,7 +389,7 @@ public class Controller1 implements Initializable {
     }
 
 
-///////////////////////////////Additional funtionality//////////////////////////////////////
+///////////////////////////////Additional functionality//////////////////////////////////////
 
     private void execute(String query) {
         Connection connection = getConnection();
@@ -378,10 +404,10 @@ public class Controller1 implements Initializable {
         showMeetings();
     }
     
-    private int checkForm(String modifier){
+    private int formValidator(String modifier){
         int answerCode = 0;
         switch (modifier) {
-            case "create":
+            case "createMeeting":
                 if (inputTitle.getText().isEmpty()) {
                     answerCode = -1;
                 } else if (inputStart.getValue() == null) {
@@ -392,22 +418,24 @@ public class Controller1 implements Initializable {
                     answerCode = -1;
                 }
                 break;
-            case "delete":
-                if(inputID.getText().isEmpty())
+            case "deleteMeeting":
+                if(!checkInt(inputID.getText())){
                     answerCode = -1;
+                }
                 break;
-            case "update":
-                if(inputID.getText().isEmpty())
+            case "updateMeeting":
+                if(!checkInt(inputID.getText())){
                     answerCode = -1;
-                else if (inputTitle.getText().isEmpty()) {
+                } else if (inputTitle.getText().isEmpty()) {
                     answerCode = -2;
                 } else if (inputStart.getValue() == null) {
                     answerCode = -2;
                 } else if (inputEnd.getValue() == null) {
                     answerCode = -2;
-                } else if (inputAgenda.getText() == null) {
+                } else if (inputAgenda.getText().isEmpty()) {
                     answerCode = -2;
                 }
+                break;
             case "createNote":
                 if(selectedMeeting == null){
                     answerCode = -1;
@@ -424,14 +452,14 @@ public class Controller1 implements Initializable {
                     answerCode = -2;
                 } else if(inputNoteOverview.getText().length() > 200){
                     answerCode = -3;
-                } else if(inputNoteID.getText().isEmpty()){
+                } else if(!checkInt(inputNoteID.getText())){
                     answerCode = -4;
                 }
                 break;
             case "deleteNote":
                 if(selectedMeeting == null){
                     answerCode = -1;
-                } else if(inputNoteID.getText().isEmpty()){
+                } else if(!checkInt(inputNoteID.getText())){
                     answerCode = -2;
                 }
                 break;
@@ -441,6 +469,22 @@ public class Controller1 implements Initializable {
         return answerCode;
     }
 
+    public boolean checkRows(String query) throws SQLException {
+        int rows;
+        Connection conn = getConnection();
+        Statement statement;
+        statement = conn.createStatement();
+        rows = statement.executeUpdate(query);
+        return rows != 0;
+    }
+    public Boolean checkInt(String input){
+        try{
+            Integer.parseInt(input);
+        }catch(NumberFormatException nfe){
+            return false;
+        }
+        return true;
+    }
     public LocalDate parseDate(String date){
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
         return LocalDate.parse(date, formatter);

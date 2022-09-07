@@ -1,15 +1,11 @@
 package com.example.meetingplanner_demo;
 
-import javafx.scene.text.Text;
-
-import java.util.Date;
-
 public class Meetings {
-    private Integer ID;
-    private String title;
-    private String start;
-    private String end;
-    private String agenda;
+    private final Integer ID;
+    private final String title;
+    private final String start;
+    private final String end;
+    private final String agenda;
     //private String note;
 
 
