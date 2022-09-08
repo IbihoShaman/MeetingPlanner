@@ -9,9 +9,10 @@ public class DB {
         Connection conn;
         try{
             conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/meetings", "root", "root");
-            System.out.println("Connected to database");
+            Main.logger.trace("Connection to database successful");
             return conn;
         }catch (Exception e){
+            Main.logger.fatal("Database connection failed");
             System.out.println(e.getMessage());
             return null;
         }
