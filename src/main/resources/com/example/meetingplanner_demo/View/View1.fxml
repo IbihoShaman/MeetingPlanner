@@ -75,7 +75,7 @@
                <graphic>
                   <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
                      <image>
-                        <Image url="@../../../icons8_plus_+_512px.png" />
+                        <Image url="@../icons/icons8_plus_+_512px.png" />
                      </image>
                   </ImageView>
                </graphic></Button>
@@ -85,7 +85,7 @@
                      <graphic>
                         <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
                            <image>
-                              <Image url="@../../../icons8_restart_208px_1.png" />
+                              <Image url="@../icons/icons8_restart_208px_1.png" />
                            </image>
                         </ImageView>
                      </graphic></Button>
@@ -111,7 +111,7 @@
          <graphic>
             <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
                <image>
-                  <Image url="@../../../icons8_delete_96px.png" />
+                  <Image url="@../icons/icons8_delete_96px.png" />
                </image>
             </ImageView>
          </graphic></Button>
@@ -166,7 +166,7 @@
                                  <graphic>
                                     <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
                                        <image>
-                                          <Image url="@../../../icons8_plus_+_512px.png" />
+                                          <Image url="@../icons/icons8_plus_+_512px.png" />
                                        </image>
                                     </ImageView>
                                  </graphic>
@@ -175,7 +175,7 @@
                                  <graphic>
                                     <ImageView fitHeight="21.0" fitWidth="23.0" pickOnBounds="true" preserveRatio="true">
                                        <image>
-                                          <Image url="@../../../icons8_restart_208px_1.png" />
+                                          <Image url="@../icons/icons8_restart_208px_1.png" />
                                        </image>
                                     </ImageView>
                                  </graphic>
@@ -198,7 +198,7 @@
                                  <graphic>
                                     <ImageView fitHeight="20.0" fitWidth="22.0" pickOnBounds="true" preserveRatio="true">
                                        <image>
-                                          <Image url="@../../../icons8_delete_96px.png" />
+                                          <Image url="@../icons/icons8_delete_96px.png" />
                                        </image>
                                     </ImageView>
                                  </graphic>
