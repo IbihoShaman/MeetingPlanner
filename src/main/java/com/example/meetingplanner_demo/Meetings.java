@@ -21,7 +21,6 @@ public class Meetings {
         return end;
     }
     public String getAgenda(){ return agenda; }
-    //public String getNote() { return note; }
 
     public Meetings(Integer ID, String title, String start, String end, String agenda) {
         this.ID = ID;
@@ -29,6 +28,5 @@ public class Meetings {
         this.start = start;
         this.end = end;
         this.agenda = agenda;
-        //this.note = note;
     }
 }
