@@ -7,6 +7,8 @@ import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.paint.Color;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.sql.*;
 import java.net.URL;
@@ -101,8 +103,10 @@ public class Controller1 implements Initializable {
                 meetingList.add(meeting);
             }
         }catch(Exception e){
+            Main.logger.error("Could not fetch meetings from database");
             e.printStackTrace();
         }
+        Main.logger.trace("Meeting list successfully filled with meetings");
         return meetingList;
     }
 
@@ -123,8 +127,10 @@ public class Controller1 implements Initializable {
                 notesList.add(note);
             }
         }catch(Exception e){
+            Main.logger.error("Could not fetch notes from database");
             e.printStackTrace();
         }
+        Main.logger.trace("Note list successfully filled with notes");
         return notesList;
     }
 ///////////////////////////////////Meeting functionality/////////////////////////////////////
@@ -136,9 +142,9 @@ public class Controller1 implements Initializable {
         colTitle.setCellValueFactory(new PropertyValueFactory<>("title"));
         colStart.setCellValueFactory(new PropertyValueFactory<>("start"));
         colEnd.setCellValueFactory(new PropertyValueFactory<>("end"));
-        //colNote.setCellValueFactory(new PropertyValueFactory<Meetings, String>("note"));
 
         tableMeetings.setItems(list);
+        Main.logger.trace("Meeting table populated");
     }
 
 
@@ -148,6 +154,7 @@ public class Controller1 implements Initializable {
         switch (formValidator(modifier)){
             //form filled out correctly, meeting created in database, table view updated
             case 0:
+                int currentID = 0;
                 String formattedStartDate = formatStart();
                 String formattedEndDate = formatEnd();
                 //insert data into meetinglist table (notes added to different table)
@@ -158,18 +165,23 @@ public class Controller1 implements Initializable {
                 Connection conn = database.getConnection();
                 query = "SELECT meetingID FROM meetinglist WHERE title = '" + inputTitle.getText() + "'";
                 Statement statement;
-                statement = conn.createStatement();
-                ResultSet result;
-                result = statement.executeQuery(query);
-                int currentID = 0;
-                if(result.next()) {
-                    currentID = result.getInt(1);
+                try {
+                    statement = conn.createStatement();
+                    ResultSet result;
+                    result = statement.executeQuery(query);
+                    while (result.next()) {
+                        currentID = result.getInt(1);
+                    }
+                }catch (Exception e){
+                    Main.logger.error("Error fetching meetingID in createMeeting()");
+                    e.printStackTrace();
                 }
                 //insert note with corresponding meeting ID
                 query = "INSERT INTO meetingnotes (noteText, meetingID) VALUES ('" + inputNote.getText() + "','" + currentID + "')";
                 execute(query);
                 labelForm.setText("Meeting successfully created");
                 labelForm.setTextFill(Color.color(0, 0.9, 0.2));
+                Main.logger.trace("Meeting added to database");
                 break;
             //form not filled out correctly
             case -1:
@@ -183,6 +195,7 @@ public class Controller1 implements Initializable {
             default:
                 labelForm.setText("Something went wrong");
                 labelForm.setTextFill(Color.color(1, 0.1, 0.2 ));
+                Main.logger.error("Default case log at createMeeting(); case: " + formValidator(modifier));
                 break;
         }
     }
@@ -218,6 +231,7 @@ public class Controller1 implements Initializable {
             default:
                 labelForm.setText("Something went wrong");
                 labelForm.setTextFill(Color.color(1, 0.1, 0.2 ));
+                Main.logger.error("Default case log at updateMeeting()");
                 break;
         }
     }
@@ -243,6 +257,7 @@ public class Controller1 implements Initializable {
             default:
                 labelForm.setText("Something went wrong");
                 labelForm.setTextFill(Color.color(1, 0.1, 0.2 ));
+                Main.logger.error("Default case log at deleteMeeting(); case: " + formValidator(modifier));
                 break;
         }
     }
@@ -307,6 +322,7 @@ public class Controller1 implements Initializable {
             default:
                 labelNoteOverview.setText("Something went wrong");
                 labelNoteOverview.setTextFill(Color.color(1, 0.1, 0.2 ));
+                Main.logger.error("Default case log at addNote(); case: " + formValidator(modifier));
                 break;
         }
 
@@ -345,6 +361,7 @@ public class Controller1 implements Initializable {
             default:
                 labelNoteOverview.setText("Something went wrong");
                 labelNoteOverview.setTextFill(Color.color(1, 0.1, 0.2 ));
+                Main.logger.error("Default case log at updateNote(); case: " + formValidator(modifier));
                 break;
         }
     }
@@ -369,6 +386,7 @@ public class Controller1 implements Initializable {
             default:
                 labelNoteOverview.setText("Something went wrong");
                 labelNoteOverview.setTextFill(Color.color(1, 0.1, 0.2 ));
+                Main.logger.error("Default case log at deleteNote(); case: " + formValidator(modifier));
                 break;
         }
     }
@@ -383,9 +401,10 @@ public class Controller1 implements Initializable {
             statement = connection.createStatement();
             statement.executeUpdate(query);
         }catch(Exception e){
+            Main.logger.fatal("Query execution failed");
             e.printStackTrace();
         }
-        System.out.println("Table populated");
+        Main.logger.trace("Query execution successful");
         showMeetings();
     }
     
@@ -449,8 +468,10 @@ public class Controller1 implements Initializable {
                 }
                 break;
             default:
+                Main.logger.error("Default case log at form Validator(); case: " + modifier);
                 break;
         }
+        Main.logger.error("Modifier passed through form validator with code: " + answerCode);
         return answerCode;
     }
 

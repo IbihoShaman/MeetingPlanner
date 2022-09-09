@@ -28,5 +28,6 @@ public class Meetings {
         this.start = start;
         this.end = end;
         this.agenda = agenda;
+        Main.logger.trace("Meeting object created with meetingID: " + this.getID());
     }
 }

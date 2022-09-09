@@ -13,5 +13,6 @@ public class Notes {
         this.noteID = noteID;
         this.parentMeetingID = parentMeetingID;
         this.noteText = noteText;
+        Main.logger.trace("Note object created with ID: " + this.getNoteID() + " and parentID: " + this.getParentMeetingID());
     }
 }
