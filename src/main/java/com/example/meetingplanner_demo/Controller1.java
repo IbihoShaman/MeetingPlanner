@@ -10,6 +10,19 @@ import javafx.scene.paint.Color;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import com.itextpdf.layout.element.Cell;
+import com.itextpdf.io.font.constants.StandardFonts;
+import com.itextpdf.io.image.ImageData;
+import com.itextpdf.io.image.ImageDataFactory;
+import com.itextpdf.kernel.colors.ColorConstants;
+import com.itextpdf.kernel.font.PdfFontFactory;
+import com.itextpdf.kernel.pdf.*;
+import com.itextpdf.layout.Document;
+import com.itextpdf.layout.element.*;
+import com.itextpdf.layout.properties.UnitValue;
+
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.sql.*;
 import java.net.URL;
 import java.time.LocalDate;
@@ -29,6 +42,8 @@ public class Controller1 implements Initializable {
     private Label labelAgenda;
     @FXML
     private Label labelNoteOverview;
+    @FXML
+    private Label labelPdf;
     @FXML
     private TextField inputID;
     @FXML
@@ -76,6 +91,8 @@ public class Controller1 implements Initializable {
     private Button buttonUpdateNote;
     @FXML
     private Button buttonDeleteNote;
+    @FXML
+    private Button buttonGeneratePdf;
 
     DB database = new DB();
     private Meetings selectedMeeting;
@@ -86,6 +103,76 @@ public class Controller1 implements Initializable {
         //getConnection();
         showMeetings();
     }
+
+
+
+    public static final String LOREM_IPSUM_TEXT = "Lorem ipsum dolor sit amet, consectetur adipisici elit, sed eiusmod tempor incidunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquid ex ea commodi consequat. Quis aute iure reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint obcaecat cupiditat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.";
+    public static final String TARGET_PDF = "Meeting.pdf";
+
+    public void generatePdf() throws IOException {
+        String modifier = "generatePdf";
+        switch (formValidator(modifier)){
+            case 0:
+                PdfWriter writer = new PdfWriter(TARGET_PDF);
+                PdfDocument pdf = new PdfDocument(writer);
+                Document document = new Document(pdf);
+
+                Paragraph meetingHeader = new Paragraph(selectedMeeting.getTitle() + " - Meeting Overview")
+                        .setFont(PdfFontFactory.createFont(StandardFonts.COURIER))
+                        .setFontSize(24)
+                        .setBold()
+                        .setPaddingLeft(50);
+                document.add(meetingHeader);
+                Paragraph meetingSchedule = new Paragraph("Meeting kick-off: " + selectedMeeting.getStart() +
+                                                                "\n Meeting end: " + selectedMeeting.getEnd())
+                        .setBold()
+                        .setFontSize(16);
+                document.add(meetingSchedule);
+
+                Paragraph meetingAgendaHeader = new Paragraph("Meeting Agenda: \n")
+                        .setBold()
+                        .setFontSize(16);
+                document.add(meetingAgendaHeader);
+                document.add(new Paragraph(selectedMeeting.getAgenda()).setFontSize(14));
+
+                Paragraph listHeader = new Paragraph("Meeting Notes")
+                        .setFontSize(16)
+                        .setBold();
+                List list = new List()
+                        .setSymbolIndent(12)
+                        .setListSymbol("\u2022")
+                        .setFontSize(14);
+                ObservableList<Notes> listNotes = getNotesList(selectedMeeting.getID());
+                if(listNotes.isEmpty()){
+                    list.add(new ListItem("No notes appended to this meeting yet"));
+                } else {
+                    listNotes.forEach((Notes) -> {
+                        list.add(Notes.getNoteText());
+                    });
+                }
+                document.add(listHeader);
+                document.add(list);
+
+                //document.add(new AreaBreak());
+                document.close();
+                labelPdf.setText("PDF successfully created");
+                labelPdf.setTextFill(Color.color(0, 0.9, 0.2));
+                break;
+            case -1:
+                labelPdf.setText("Select a meeting from the table below first!");
+                labelPdf.setTextFill(Color.color(1, 0.1, 0.2 ));
+                break;
+            default:
+                Main.logger.error("Default case log at generatePdf(); case: " + formValidator(modifier));
+                break;
+        }
+    }
+
+    private static Cell getHeaderCell(String s) {
+        return new Cell().add(new Paragraph(s)).setBold().setBackgroundColor(ColorConstants.GRAY);
+    }
+
+
 
     //reads all meeting entries in the database into an observable list and returns it
     public ObservableList<Meetings> getMeetingList(){
@@ -177,8 +264,10 @@ public class Controller1 implements Initializable {
                     e.printStackTrace();
                 }
                 //insert note with corresponding meeting ID
-                query = "INSERT INTO meetingnotes (noteText, meetingID) VALUES ('" + inputNote.getText() + "','" + currentID + "')";
-                execute(query);
+                if(!inputNote.getText().isEmpty()) {
+                    query = "INSERT INTO meetingnotes (noteText, meetingID) VALUES ('" + inputNote.getText() + "','" + currentID + "')";
+                    execute(query);
+                }
                 labelForm.setText("Meeting successfully created");
                 labelForm.setTextFill(Color.color(0, 0.9, 0.2));
                 Main.logger.trace("Meeting added to database");
@@ -467,11 +556,16 @@ public class Controller1 implements Initializable {
                     answerCode = -2;
                 }
                 break;
+            case "generatePdf":
+                if(selectedMeeting == null){
+                    answerCode = -1;
+                }
+                break;
             default:
                 Main.logger.error("Default case log at form Validator(); case: " + modifier);
                 break;
         }
-        Main.logger.error("Modifier passed through form validator with code: " + answerCode);
+        Main.logger.trace("Modifier passed through form validator with answerCode: " + answerCode + " on case: " + modifier);
         return answerCode;
     }
 

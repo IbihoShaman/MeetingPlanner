@@ -8,6 +8,9 @@ module com.example.meetingplanner_demo {
     requires com.dlsc.formsfx;
     requires org.kordamp.bootstrapfx.core;
     requires java.sql;
+    requires io;
+    requires kernel;
+    requires layout;
 
     opens com.example.meetingplanner_demo to javafx.fxml;
     exports com.example.meetingplanner_demo;
