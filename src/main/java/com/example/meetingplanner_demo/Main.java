@@ -24,14 +24,6 @@ public class Main extends Application {
     }
 
     public static void main(String[] args) {
-        try (FileReader reader = new FileReader("config")){
-            Properties properties = new Properties();
-            properties.load(reader);
-            //String string = properties.getProperty("variable");
-            //System.out.println(string);
-        } catch (Exception e){
-            e.printStackTrace();
-        }
         launch();
     }
 }

@@ -94,7 +94,7 @@ public class Controller1 implements Initializable {
     @FXML
     private Button buttonGeneratePdf;
 
-    DB database = new DB();
+    DB database = new DB(configurationLogic.getConfiguration("connectionString"));
     private Meetings selectedMeeting;
 
     //populates the table view on launch
