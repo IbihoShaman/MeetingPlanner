@@ -29,7 +29,7 @@ CREATE TABLE `meetinglist` (
   `end` varchar(45) NOT NULL,
   `agenda` text NOT NULL,
   PRIMARY KEY (`meetingID`)
-) ENGINE=InnoDB AUTO_INCREMENT=40 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=45 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -38,7 +38,7 @@ CREATE TABLE `meetinglist` (
 
 LOCK TABLES `meetinglist` WRITE;
 /*!40000 ALTER TABLE `meetinglist` DISABLE KEYS */;
-INSERT INTO `meetinglist` VALUES (12,'asdasd','04/08/2022','07/08/2022',''),(18,'fghjk','01/09/2022','09/09/2022',''),(23,'Hello','15/09/2022','09/09/2022',''),(24,'jojaju','16/09/2022','18/09/2022',''),(25,'hhhiiiigggd','08/09/2022','16/09/2022',''),(27,'gfgffsdczzzzzz','11/09/2022','16/09/2022',''),(28,'bbbbbbbbbbb','28/09/2022','30/09/2022',''),(36,'Test','09/09/2022','17/09/2022',''),(38,'Test2','09/09/2022','17/09/2022',''),(39,'Test4','03/09/2022','09/09/2022','1.Do this\n2.Do something else');
+INSERT INTO `meetinglist` VALUES (39,'Test','03/09/2022','09/09/2022','1.Do this\n2.Do something else\n3. Finish doing stuff'),(40,'Testing Note overview','26/08/2022','28/08/2022','bla bla vla'),(43,'Testing Note Form','26/08/2022','28/08/2022','bla bla vla'),(44,'Shopping','02/09/2022','09/09/2022','1.Item one\n2.Item two\n3.Item three');
 /*!40000 ALTER TABLE `meetinglist` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
