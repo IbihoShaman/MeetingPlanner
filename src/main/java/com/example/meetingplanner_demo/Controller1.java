@@ -26,7 +26,10 @@ import java.io.IOException;
 import java.sql.*;
 import java.net.URL;
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
+import java.time.format.ResolverStyle;
 import java.util.ResourceBundle;
 
 public class Controller1 implements Initializable {
@@ -51,7 +54,11 @@ public class Controller1 implements Initializable {
     @FXML
     private DatePicker inputStart;
     @FXML
+    private TextField inputStartTime;
+    @FXML
     private DatePicker inputEnd;
+    @FXML
+    private TextField inputEndTime;
     @FXML
     private TextArea inputAgenda;
     @FXML
@@ -123,8 +130,8 @@ public class Controller1 implements Initializable {
                         .setBold()
                         .setPaddingLeft(50);
                 document.add(meetingHeader);
-                Paragraph meetingSchedule = new Paragraph("Meeting kick-off: " + selectedMeeting.getStart() +
-                                                                "\n Meeting end: " + selectedMeeting.getEnd())
+                Paragraph meetingSchedule = new Paragraph("Meeting kick-off: " + selectedMeeting.getStartDate() + " " + selectedMeeting.getStartTime() +
+                                                                "\n Meeting end: " + selectedMeeting.getEndDate() + " " + selectedMeeting.getEndTime())
                         .setBold()
                         .setFontSize(16);
                 document.add(meetingSchedule);
@@ -186,7 +193,8 @@ public class Controller1 implements Initializable {
             results = statement.executeQuery(query);
             Meetings meeting;
             while(results.next()){
-                meeting = new Meetings(results.getInt("meetingID"), results.getString("title"), results.getString("start"), results.getString("end"), results.getString("agenda"));
+                meeting = new Meetings(results.getInt("meetingID"), results.getString("title"), results.getString("startDate"), results.getString("startTime"), results.getString("endDate"),
+                                        results.getString("endTime"), results.getString("agenda"));
                 meetingList.add(meeting);
             }
         }catch(Exception e){
@@ -227,8 +235,8 @@ public class Controller1 implements Initializable {
         ObservableList<Meetings> list = getMeetingList();
         colID.setCellValueFactory(new PropertyValueFactory<>("ID"));
         colTitle.setCellValueFactory(new PropertyValueFactory<>("title"));
-        colStart.setCellValueFactory(new PropertyValueFactory<>("start"));
-        colEnd.setCellValueFactory(new PropertyValueFactory<>("end"));
+        colStart.setCellValueFactory(new PropertyValueFactory<>("startDate"));
+        colEnd.setCellValueFactory(new PropertyValueFactory<>("endDate"));
 
         tableMeetings.setItems(list);
         Main.logger.trace("Meeting table populated");
@@ -245,7 +253,8 @@ public class Controller1 implements Initializable {
                 String formattedStartDate = formatStart();
                 String formattedEndDate = formatEnd();
                 //insert data into meetinglist table (notes added to different table)
-                String query = "INSERT INTO meetinglist (title, start, end, agenda) VALUES ('" + inputTitle.getText() + "','" + formattedStartDate + "','" + formattedEndDate + "','" + inputAgenda.getText() + "')";
+                String query = "INSERT INTO meetinglist (title, startDate, startTime, endDate, endTime, agenda) VALUES ('" + inputTitle.getText() + "','" + formattedStartDate + "','" + inputStartTime.getText()
+                        + "','" + formattedEndDate + "','" + inputEndTime.getText() + "','" + inputAgenda.getText() + "')";
                 execute(query);
                 ////Adding appended note to meetingNotes table/////
                 //get meeting ID to which the note will be appended (suboptimal solution might change later)
@@ -278,7 +287,7 @@ public class Controller1 implements Initializable {
                 labelForm.setTextFill(Color.color(1, 0.1, 0.2 ));
                 break;
             case -2:
-                labelForm.setText("Error! ID field filled incorrectly");
+                labelForm.setText("Error! Incorrect time format entered");
                 labelForm.setTextFill(Color.color(1, 0.1, 0.2 ));
                 break;
             default:
@@ -296,7 +305,7 @@ public class Controller1 implements Initializable {
             case 0:
                 String formattedStartDate = formatStart();
                 String formattedEndDate = formatEnd();
-                String query = "UPDATE meetinglist SET title = '" + inputTitle.getText() + "', start = '" + formattedStartDate + "', end = '" + formattedEndDate + "', agenda = '" + inputAgenda.getText() +
+                String query = "UPDATE meetinglist SET title = '" + inputTitle.getText() + "', startDate = '" + formattedStartDate + "', startTime = '" + inputStartTime.getText() + "', endDate = '" + formattedEndDate + "', endTime = '" + inputEndTime.getText() + "', agenda = '" + inputAgenda.getText() +
                         "' WHERE meetingID = " + inputID.getText();
                 if(!checkRows(query)){
                     labelForm.setText("No meeting with given ID found");
@@ -356,13 +365,13 @@ public class Controller1 implements Initializable {
 
         inputID.setText("" + selectedMeeting.getID());
         inputTitle.setText(selectedMeeting.getTitle());
-        inputStart.setValue(parseDate(selectedMeeting.getStart()));
-        inputEnd.setValue(parseDate(selectedMeeting.getEnd()));
+        inputStart.setValue(parseDate(selectedMeeting.getStartDate()));
+        inputEnd.setValue(parseDate(selectedMeeting.getEndDate()));
         inputAgenda.setText(selectedMeeting.getAgenda());
 
         labelTitle.setText("TITLE : " + selectedMeeting.getTitle());
-        labelStart.setText("FROM : " + selectedMeeting.getStart());
-        labelEnd.setText("TO : " + selectedMeeting.getEnd());
+        labelStart.setText("FROM : " + selectedMeeting.getStartDate() + " " + selectedMeeting.getStartTime());
+        labelEnd.setText("TO : " + selectedMeeting.getEndDate() + " " + selectedMeeting.getEndTime());
         labelAgenda.setText("AGENDA : \n" + selectedMeeting.getAgenda());
 
         showNotes(selectedMeeting.getID());
@@ -501,14 +510,11 @@ public class Controller1 implements Initializable {
         int answerCode = 0;
         switch (modifier) {
             case "createMeeting":
-                if (inputTitle.getText().isEmpty()) {
+                if(inputTitle.getText().isEmpty() || inputStart.getValue() == null || inputEnd.getValue() == null
+                    || inputEndTime.getText().isEmpty() || inputStartTime.getText().isEmpty() || inputTitle.getText().isEmpty()) {
                     answerCode = -1;
-                } else if (inputStart.getValue() == null) {
-                    answerCode = -1;
-                } else if (inputEnd.getValue() == null) {
-                    answerCode = -1;
-                } else if (inputAgenda.getText().isEmpty()) {
-                    answerCode = -1;
+                } else if(!parseTime(inputStartTime.getText()) || !parseTime(inputEndTime.getText())){
+                    answerCode = -2;
                 }
                 break;
             case "deleteMeeting":
@@ -588,6 +594,19 @@ public class Controller1 implements Initializable {
     public LocalDate parseDate(String date){
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
         return LocalDate.parse(date, formatter);
+    }
+    public boolean parseTime(String time){
+        try {
+            DateTimeFormatter strictTimeFormatter = DateTimeFormatter.ofPattern("HH:mm")
+                    .withResolverStyle(ResolverStyle.STRICT);
+            LocalTime.parse(time, strictTimeFormatter);
+            System.out.println("Valid time string: " + time);
+            return true;
+        } catch (DateTimeParseException | NullPointerException e) {
+            Main.logger.info("Invalid time input in parseTime()");
+            System.out.println("Invalid time string: " + time);
+        }
+        return false;
     }
     public String formatStart(){
         LocalDate startDate = inputStart.getValue();

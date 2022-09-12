@@ -11,7 +11,10 @@
 <?import javafx.scene.image.Image?>
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
@@ -67,8 +70,25 @@
                   <Font size="14.0" />
                </font>
             </TextField>
-            <DatePicker fx:id="inputStart" prefHeight="26.0" prefWidth="175.0" />
-            <DatePicker fx:id="inputEnd" prefHeight="28.0" prefWidth="175.0" />
+            <GridPane prefHeight="71.0" prefWidth="238.0">
+              <columnConstraints>
+                <ColumnConstraints hgrow="SOMETIMES" maxWidth="116.80000305175781" minWidth="10.0" prefWidth="103.39998779296874" />
+                <ColumnConstraints hgrow="SOMETIMES" maxWidth="75.20001220703125" minWidth="10.0" prefWidth="43.40001220703127" />
+                  <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+              </columnConstraints>
+              <rowConstraints>
+                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+              </rowConstraints>
+               <children>
+                  <DatePicker fx:id="inputStart" prefHeight="26.0" prefWidth="102.0" />
+                  <DatePicker fx:id="inputEnd" prefHeight="26.0" prefWidth="101.0" GridPane.rowIndex="1" />
+                  <TextField fx:id="inputStartTime" alignment="CENTER" GridPane.columnIndex="2" />
+                  <Label alignment="CENTER" prefHeight="18.0" prefWidth="80.0" text="Time:" textAlignment="CENTER" GridPane.columnIndex="1" />
+                  <Label alignment="CENTER" prefHeight="18.0" prefWidth="80.0" text="Time:" textAlignment="CENTER" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                  <TextField fx:id="inputEndTime" alignment="CENTER" GridPane.columnIndex="2" GridPane.rowIndex="1" />
+               </children>
+            </GridPane>
             <TextArea fx:id="inputAgenda" prefHeight="74.0" prefWidth="238.0" />
             <TextArea fx:id="inputNote" prefHeight="40.0" prefWidth="254.0" />
             <Button fx:id="buttonCreate" mnemonicParsing="false" onAction="#createMeeting" text="Create Meeting">
