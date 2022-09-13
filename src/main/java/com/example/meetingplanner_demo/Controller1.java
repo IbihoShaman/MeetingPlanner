@@ -366,7 +366,9 @@ public class Controller1 implements Initializable {
         inputID.setText("" + selectedMeeting.getID());
         inputTitle.setText(selectedMeeting.getTitle());
         inputStart.setValue(parseDate(selectedMeeting.getStartDate()));
+        inputStartTime.setText(selectedMeeting.getStartTime());
         inputEnd.setValue(parseDate(selectedMeeting.getEndDate()));
+        inputEndTime.setText(selectedMeeting.getEndTime());
         inputAgenda.setText(selectedMeeting.getAgenda());
 
         labelTitle.setText("TITLE : " + selectedMeeting.getTitle());
