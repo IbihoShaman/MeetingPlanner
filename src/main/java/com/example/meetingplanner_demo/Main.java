@@ -1,7 +1,5 @@
 package com.example.meetingplanner_demo;
 
-import java.io.FileReader;
-import java.util.Properties;
 import org.apache.logging.log4j.*;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;

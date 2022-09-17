@@ -1,5 +1,10 @@
-package com.example.meetingplanner_demo;
+package com.example.meetingplanner_demo.ViewModels;
 
+import com.example.meetingplanner_demo.*;
+import com.example.meetingplanner_demo.BusinessLayer.configurationLogic;
+import com.example.meetingplanner_demo.DataAccessLayer.DB;
+import com.example.meetingplanner_demo.Models.Meetings;
+import com.example.meetingplanner_demo.Models.Notes;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -7,21 +12,15 @@ import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.paint.Color;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
-import com.itextpdf.layout.element.Cell;
 import com.itextpdf.io.font.constants.StandardFonts;
-import com.itextpdf.io.image.ImageData;
-import com.itextpdf.io.image.ImageDataFactory;
-import com.itextpdf.kernel.colors.ColorConstants;
 import com.itextpdf.kernel.font.PdfFontFactory;
 import com.itextpdf.kernel.pdf.*;
 import com.itextpdf.layout.Document;
 import com.itextpdf.layout.element.*;
-import com.itextpdf.layout.properties.UnitValue;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.sql.*;
 import java.net.URL;
@@ -101,8 +100,10 @@ public class Controller1 implements Initializable {
     @FXML
     private Button buttonGeneratePdf;
 
+    public static Logger logger = LogManager.getLogger(Main.class.getName());
     DB database = new DB(configurationLogic.getConfiguration("connectionString"));
     private Meetings selectedMeeting;
+    public static final String TARGET_PDF = configurationLogic.getConfiguration("PdfName");
 
     //populates the table view on launch
     @Override
@@ -110,11 +111,6 @@ public class Controller1 implements Initializable {
         //getConnection();
         showMeetings();
     }
-
-
-
-    public static final String LOREM_IPSUM_TEXT = "Lorem ipsum dolor sit amet, consectetur adipisici elit, sed eiusmod tempor incidunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquid ex ea commodi consequat. Quis aute iure reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint obcaecat cupiditat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.";
-    public static final String TARGET_PDF = "Meeting.pdf";
 
     public void generatePdf() throws IOException {
         String modifier = "generatePdf";
@@ -153,9 +149,7 @@ public class Controller1 implements Initializable {
                 if(listNotes.isEmpty()){
                     list.add(new ListItem("No notes appended to this meeting yet"));
                 } else {
-                    listNotes.forEach((Notes) -> {
-                        list.add(Notes.getNoteText());
-                    });
+                    listNotes.forEach((Notes) -> list.add(Notes.getNoteText()));
                 }
                 document.add(listHeader);
                 document.add(list);
@@ -170,16 +164,10 @@ public class Controller1 implements Initializable {
                 labelPdf.setTextFill(Color.color(1, 0.1, 0.2 ));
                 break;
             default:
-                Main.logger.error("Default case log at generatePdf(); case: " + formValidator(modifier));
+                logger.error("Default case log at generatePdf(); case: " + formValidator(modifier));
                 break;
         }
     }
-
-    private static Cell getHeaderCell(String s) {
-        return new Cell().add(new Paragraph(s)).setBold().setBackgroundColor(ColorConstants.GRAY);
-    }
-
-
 
     //reads all meeting entries in the database into an observable list and returns it
     public ObservableList<Meetings> getMeetingList(){
@@ -198,10 +186,10 @@ public class Controller1 implements Initializable {
                 meetingList.add(meeting);
             }
         }catch(Exception e){
-            Main.logger.error("Could not fetch meetings from database");
+            logger.error("Could not fetch meetings from database");
             e.printStackTrace();
         }
-        Main.logger.trace("Meeting list successfully filled with meetings");
+        logger.trace("Meeting list successfully filled with meetings");
         return meetingList;
     }
 
@@ -222,10 +210,10 @@ public class Controller1 implements Initializable {
                 notesList.add(note);
             }
         }catch(Exception e){
-            Main.logger.error("Could not fetch notes from database");
+            logger.error("Could not fetch notes from database");
             e.printStackTrace();
         }
-        Main.logger.trace("Note list successfully filled with notes");
+        logger.trace("Note list successfully filled with notes");
         return notesList;
     }
 ///////////////////////////////////Meeting functionality/////////////////////////////////////
@@ -239,12 +227,12 @@ public class Controller1 implements Initializable {
         colEnd.setCellValueFactory(new PropertyValueFactory<>("endDate"));
 
         tableMeetings.setItems(list);
-        Main.logger.trace("Meeting table populated");
+        logger.trace("Meeting table populated");
     }
 
 
     //creates a meeting and calls an update for the table view data if creation was successful
-    public void createMeeting() throws SQLException {
+    public void createMeeting() {
         String modifier = "createMeeting";
         switch (formValidator(modifier)){
             //form filled out correctly, meeting created in database, table view updated
@@ -269,7 +257,7 @@ public class Controller1 implements Initializable {
                         currentID = result.getInt(1);
                     }
                 }catch (Exception e){
-                    Main.logger.error("Error fetching meetingID in createMeeting()");
+                    logger.error("Error fetching meetingID in createMeeting()");
                     e.printStackTrace();
                 }
                 //insert note with corresponding meeting ID
@@ -279,7 +267,7 @@ public class Controller1 implements Initializable {
                 }
                 labelForm.setText("Meeting successfully created");
                 labelForm.setTextFill(Color.color(0, 0.9, 0.2));
-                Main.logger.trace("Meeting added to database");
+                logger.trace("Meeting added to database");
                 break;
             //form not filled out correctly
             case -1:
@@ -293,7 +281,7 @@ public class Controller1 implements Initializable {
             default:
                 labelForm.setText("Something went wrong");
                 labelForm.setTextFill(Color.color(1, 0.1, 0.2 ));
-                Main.logger.error("Default case log at createMeeting(); case: " + formValidator(modifier));
+                logger.error("Default case log at createMeeting(); case: " + formValidator(modifier));
                 break;
         }
     }
@@ -329,7 +317,7 @@ public class Controller1 implements Initializable {
             default:
                 labelForm.setText("Something went wrong");
                 labelForm.setTextFill(Color.color(1, 0.1, 0.2 ));
-                Main.logger.error("Default case log at updateMeeting()");
+                logger.error("Default case log at updateMeeting()");
                 break;
         }
     }
@@ -355,7 +343,7 @@ public class Controller1 implements Initializable {
             default:
                 labelForm.setText("Something went wrong");
                 labelForm.setTextFill(Color.color(1, 0.1, 0.2 ));
-                Main.logger.error("Default case log at deleteMeeting(); case: " + formValidator(modifier));
+                logger.error("Default case log at deleteMeeting(); case: " + formValidator(modifier));
                 break;
         }
     }
@@ -422,7 +410,7 @@ public class Controller1 implements Initializable {
             default:
                 labelNoteOverview.setText("Something went wrong");
                 labelNoteOverview.setTextFill(Color.color(1, 0.1, 0.2 ));
-                Main.logger.error("Default case log at addNote(); case: " + formValidator(modifier));
+                logger.error("Default case log at addNote(); case: " + formValidator(modifier));
                 break;
         }
 
@@ -461,7 +449,7 @@ public class Controller1 implements Initializable {
             default:
                 labelNoteOverview.setText("Something went wrong");
                 labelNoteOverview.setTextFill(Color.color(1, 0.1, 0.2 ));
-                Main.logger.error("Default case log at updateNote(); case: " + formValidator(modifier));
+                logger.error("Default case log at updateNote(); case: " + formValidator(modifier));
                 break;
         }
     }
@@ -486,7 +474,7 @@ public class Controller1 implements Initializable {
             default:
                 labelNoteOverview.setText("Something went wrong");
                 labelNoteOverview.setTextFill(Color.color(1, 0.1, 0.2 ));
-                Main.logger.error("Default case log at deleteNote(); case: " + formValidator(modifier));
+                logger.error("Default case log at deleteNote(); case: " + formValidator(modifier));
                 break;
         }
     }
@@ -501,10 +489,10 @@ public class Controller1 implements Initializable {
             statement = connection.createStatement();
             statement.executeUpdate(query);
         }catch(Exception e){
-            Main.logger.fatal("Query execution failed");
+            logger.fatal("Query execution failed");
             e.printStackTrace();
         }
-        Main.logger.trace("Query execution successful");
+        logger.trace("Query execution successful");
         showMeetings();
     }
     
@@ -570,10 +558,10 @@ public class Controller1 implements Initializable {
                 }
                 break;
             default:
-                Main.logger.error("Default case log at form Validator(); case: " + modifier);
+                logger.error("Default case log at form Validator(); case: " + modifier);
                 break;
         }
-        Main.logger.trace("Modifier passed through form validator with answerCode: " + answerCode + " on case: " + modifier);
+        logger.trace("Modifier passed through form validator with answerCode: " + answerCode + " on case: " + modifier);
         return answerCode;
     }
 
@@ -605,7 +593,8 @@ public class Controller1 implements Initializable {
             System.out.println("Valid time string: " + time);
             return true;
         } catch (DateTimeParseException | NullPointerException e) {
-            Main.logger.info("Invalid time input in parseTime()");
+
+            logger.info("Invalid time input in parseTime()");
             System.out.println("Invalid time string: " + time);
         }
         return false;

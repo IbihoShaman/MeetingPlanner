@@ -1,4 +1,6 @@
-package com.example.meetingplanner_demo;
+package com.example.meetingplanner_demo.Models;
+
+import com.example.meetingplanner_demo.Main;
 
 public class Notes {
     private final Integer noteID;

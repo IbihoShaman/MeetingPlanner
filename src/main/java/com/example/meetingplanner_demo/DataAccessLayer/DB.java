@@ -1,4 +1,7 @@
-package com.example.meetingplanner_demo;
+package com.example.meetingplanner_demo.DataAccessLayer;
+
+import com.example.meetingplanner_demo.Main;
+import com.example.meetingplanner_demo.BusinessLayer.configurationLogic;
 
 import java.sql.Connection;
 import java.sql.DriverManager;

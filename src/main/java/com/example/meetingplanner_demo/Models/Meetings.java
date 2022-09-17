@@ -1,7 +1,6 @@
-package com.example.meetingplanner_demo;
+package com.example.meetingplanner_demo.Models;
 
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
+import com.example.meetingplanner_demo.Main;
 
 public class Meetings {
     private final Integer ID;
@@ -11,8 +10,6 @@ public class Meetings {
     private final String endDate;
     private final String endTime;
     private final String agenda;
-    //private String note;
-
 
     public Integer getID() { return ID; }
     public String getTitle() { return title; }

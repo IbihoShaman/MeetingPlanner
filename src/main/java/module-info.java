@@ -14,4 +14,12 @@ module com.example.meetingplanner_demo {
 
     opens com.example.meetingplanner_demo to javafx.fxml;
     exports com.example.meetingplanner_demo;
+    exports com.example.meetingplanner_demo.Models;
+    opens com.example.meetingplanner_demo.Models to javafx.fxml;
+    exports com.example.meetingplanner_demo.DataAccessLayer;
+    opens com.example.meetingplanner_demo.DataAccessLayer to javafx.fxml;
+    exports com.example.meetingplanner_demo.BusinessLayer;
+    opens com.example.meetingplanner_demo.BusinessLayer to javafx.fxml;
+    exports com.example.meetingplanner_demo.ViewModels;
+    opens com.example.meetingplanner_demo.ViewModels to javafx.fxml;
 }

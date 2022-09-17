@@ -1,4 +1,6 @@
-package com.example.meetingplanner_demo;
+package com.example.meetingplanner_demo.BusinessLayer;
+
+import com.example.meetingplanner_demo.Main;
 
 import java.io.FileReader;
 import java.util.Properties;
