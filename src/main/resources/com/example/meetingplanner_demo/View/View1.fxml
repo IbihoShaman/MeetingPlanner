@@ -119,7 +119,7 @@
             </HBox>
          </children>
       </VBox>
-      <TableView fx:id="tableMeetings" layoutX="427.0" layoutY="63.0" onMouseClicked="#displayMeetingData" prefHeight="292.0" prefWidth="390.0">
+      <TableView fx:id="tableMeetings" layoutX="427.0" layoutY="63.0" onMouseClicked="#displayMeetingDataOnClick" prefHeight="292.0" prefWidth="390.0">
         <columns>
           <TableColumn fx:id="colID" prefWidth="29.60003662109375" text="ID" />
           <TableColumn fx:id="colTitle" prefWidth="168.79998779296875" text="Title" />
@@ -170,7 +170,7 @@
             </HBox>
             <HBox prefHeight="219.0" prefWidth="806.0" spacing="20.0">
                <children>
-                  <TableView fx:id="tableNotes" onMouseClicked="#displayNoteData" prefHeight="196.0" prefWidth="430.0">
+                  <TableView fx:id="tableNotes" onMouseClicked="#displayNoteDataOnClick" prefHeight="196.0" prefWidth="430.0">
                     <columns>
                         <TableColumn fx:id="colParentID" prefWidth="76.000030875206" text="MeetingID" />
                       <TableColumn fx:id="colNoteID" prefWidth="57.600006103515625" text="NoteID" />
@@ -182,7 +182,7 @@
                         <TextArea fx:id="inputNoteOverview" prefHeight="70.0" prefWidth="346.0" />
                         <HBox prefHeight="33.0" prefWidth="346.0" spacing="10.0">
                            <children>
-                              <Button fx:id="buttonAddNote" mnemonicParsing="false" onAction="#addNote" prefHeight="30.0" prefWidth="101.0" text="Add Note">
+                              <Button fx:id="buttonAddNote" mnemonicParsing="false" onAction="#addNoteOnClick" prefHeight="30.0" prefWidth="101.0" text="Add Note">
                                  <graphic>
                                     <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
                                        <image>
@@ -191,7 +191,7 @@
                                     </ImageView>
                                  </graphic>
                               </Button>
-                              <Button fx:id="buttonUpdateNote" mnemonicParsing="false" onAction="#updateNote" prefHeight="22.0" prefWidth="110.0" text="Update Note">
+                              <Button fx:id="buttonUpdateNote" mnemonicParsing="false" onAction="#updateNoteOnClick" prefHeight="22.0" prefWidth="110.0" text="Update Note">
                                  <graphic>
                                     <ImageView fitHeight="21.0" fitWidth="23.0" pickOnBounds="true" preserveRatio="true">
                                        <image>
@@ -214,7 +214,7 @@
                         <HBox prefHeight="50.0" prefWidth="346.0">
                            <children>
                               <Label fx:id="labelNoteOverview" prefHeight="50.0" prefWidth="267.0" textAlignment="CENTER" />
-                              <Button fx:id="buttonDeleteNote" mnemonicParsing="false" onAction="#deleteNote" prefHeight="28.0" prefWidth="130.0" text="Delete Note">
+                              <Button fx:id="buttonDeleteNote" mnemonicParsing="false" onAction="#deleteNoteOnClick" prefHeight="28.0" prefWidth="130.0" text="Delete Note">
                                  <graphic>
                                     <ImageView fitHeight="20.0" fitWidth="22.0" pickOnBounds="true" preserveRatio="true">
                                        <image>

@@ -2,7 +2,8 @@ package com.example.meetingplanner_demo.ViewModels;
 
 import com.example.meetingplanner_demo.BusinessLayer.appLogic;
 import com.example.meetingplanner_demo.BusinessLayer.configurationLogic;
-import com.example.meetingplanner_demo.BusinessLayer.crudLogic;
+import com.example.meetingplanner_demo.BusinessLayer.crudLogicMeetings;
+import com.example.meetingplanner_demo.BusinessLayer.crudLogicNotes;
 import com.example.meetingplanner_demo.DataAccessLayer.DB;
 import com.example.meetingplanner_demo.Models.Meetings;
 import com.example.meetingplanner_demo.Models.Notes;
@@ -90,12 +91,12 @@ public class Controller1 implements Initializable {
     @FXML
     private Button buttonGeneratePdf;
 
-
     private final Logger controllerLogger = LogManager.getLogger(Controller1.class.getName());
     private final appLogic logicApp = new appLogic();
-    private final crudLogic logicCrud = new crudLogic();
+    private final crudLogicMeetings logicCrudMeeting = new crudLogicMeetings();
+    private final crudLogicNotes logicCrudNotes = new crudLogicNotes();
     DB database = new DB(configurationLogic.getConfiguration("connectionString"));
-    //private Meetings selectedMeeting;
+
 
     //populates the meeting table view on launch
     public void initialize(URL url, ResourceBundle resourceBundle) {
@@ -122,7 +123,7 @@ public class Controller1 implements Initializable {
 
         tableNotes.setItems(list);
     }
-
+    //calls PDF generation function in appLogic and prints message based on result
     public void generatePdfOnClick() throws IOException {
         int answerCode;
         answerCode = logicApp.generatePdf(database);
@@ -142,8 +143,10 @@ public class Controller1 implements Initializable {
                 break;
         }
     }
-    public void displayMeetingData(){
+    //when user clicks on a meeting in the table, fills input fields and labels with corresponding data
+    public void displayMeetingDataOnClick(){
         logicApp.setSelectedMeeting(tableMeetings.getSelectionModel().getSelectedItem());
+        System.out.println(logicApp.getSelectedMeeting().getTitle());
 
         inputID.setText("" + logicApp.getSelectedMeeting().getID());
         inputTitle.setText(logicApp.getSelectedMeeting().getTitle());
@@ -157,10 +160,11 @@ public class Controller1 implements Initializable {
         labelStart.setText("FROM : " + logicApp.getSelectedMeeting().getStartDate() + " " + logicApp.getSelectedMeeting().getStartTime());
         labelEnd.setText("TO : " + logicApp.getSelectedMeeting().getEndDate() + " " + logicApp.getSelectedMeeting().getEndTime());
         labelAgenda.setText("AGENDA : \n" + logicApp.getSelectedMeeting().getAgenda());
-
+        //fills Note table with notes appended to selected meeting
         showNotes(logicApp.getSelectedMeeting().getID());
     }
-    public void displayNoteData(){
+    //when user clicks on a note from the note table, fills input fields with corresponding data
+    public void displayNoteDataOnClick(){
         Notes selectedNote = tableNotes.getSelectionModel().getSelectedItem();
         inputNoteID.setText("" + selectedNote.getNoteID());
         inputNoteOverview.setText(selectedNote.getNoteText());
@@ -168,11 +172,11 @@ public class Controller1 implements Initializable {
 
     public void createMeetingOnClick(){
         String modifier = "createMeeting";
-        int answerCode = logicCrud.crudMeetingValidator(modifier, inputID, inputTitle, inputStart,
+        int answerCode = logicCrudMeeting.crudMeetingValidator(modifier, inputID, inputTitle, inputStart,
                 inputStartTime, inputEnd, inputEndTime, inputAgenda, inputNote);
         switch (answerCode){
             case 0:
-                logicCrud.createMeeting(inputTitle, inputStart, inputStartTime, inputEnd, inputEndTime, inputAgenda, inputNote, database);
+                logicCrudMeeting.createMeeting(inputTitle, inputStart, inputStartTime, inputEnd, inputEndTime, inputAgenda, inputNote, database);
                 labelForm.setText("Meeting successfully created");
                 labelForm.setTextFill(Color.color(0, 0.9, 0.2));
                 controllerLogger.trace("Meeting added to database");
@@ -196,11 +200,11 @@ public class Controller1 implements Initializable {
     }
     public void updateMeetingOnClick() throws SQLException {
         String modifier = "updateMeeting";
-        int answerCode = logicCrud.crudMeetingValidator(modifier, inputID, inputTitle, inputStart,
+        int answerCode = logicCrudMeeting.crudMeetingValidator(modifier, inputID, inputTitle, inputStart,
                 inputStartTime, inputEnd, inputEndTime, inputAgenda, inputNote);
         switch (answerCode){
             case 0:
-                if(logicCrud.updateMeeting(inputID, inputTitle, inputStart,
+                if(logicCrudMeeting.updateMeeting(inputID, inputTitle, inputStart,
                         inputStartTime, inputEnd, inputEndTime, inputAgenda, database))
                 {
                     showMeetings();
@@ -221,7 +225,7 @@ public class Controller1 implements Initializable {
                 break;
             case -3:
                 //user tried to enter a note through the meeting form -> meeting updated but note not added
-                logicCrud.updateMeeting(inputID, inputTitle, inputStart, inputStartTime,
+                logicCrudMeeting.updateMeeting(inputID, inputTitle, inputStart, inputStartTime,
                                         inputEnd, inputEndTime, inputAgenda, database);
                 showMeetings();
                 labelForm.setText("Warning! Note cannot be added in this formulary");
@@ -241,11 +245,11 @@ public class Controller1 implements Initializable {
     }
     public void deleteMeetingOnClick(){
         String modifier = "deleteMeeting";
-        int answerCode = logicCrud.crudMeetingValidator(modifier, inputID, inputTitle, inputStart,
+        int answerCode = logicCrudMeeting.crudMeetingValidator(modifier, inputID, inputTitle, inputStart,
                 inputStartTime, inputEnd, inputEndTime, inputAgenda, inputNote);
         switch (answerCode){
             case 0:
-                logicCrud.deleteMeeting(inputID, database);
+                logicCrudMeeting.deleteMeeting(inputID, database);
                 break;
             case -1:
                 labelForm.setText("Error! ID field filled incorrectly");
@@ -260,16 +264,97 @@ public class Controller1 implements Initializable {
         controllerLogger.trace("Passed through deleteMeetingOnClick() with code: " + answerCode);
     }
 
-    public void addNote(){
-
+    public void addNoteOnClick(){
+        String modifier = "addNote";
+        int executionCode = logicCrudNotes.addNote(modifier, inputNoteOverview, database, logicApp.getSelectedMeeting());
+        switch (executionCode){
+            case 0:
+                labelNoteOverview.setText("Note added to meeting ID: " + logicApp.getSelectedMeeting().getID());
+                labelNoteOverview.setTextFill(Color.color(0, 0.9, 0.2));
+                showNotes(logicApp.getSelectedMeeting().getID());
+                break;
+            case -1:
+                labelNoteOverview.setText("No meeting selected, select a meeting first");
+                labelNoteOverview.setTextFill(Color.color(1, 0.1, 0.2 ));
+                break;
+            case -2:
+                labelNoteOverview.setText("Input field is empty, cannot add note");
+                labelNoteOverview.setTextFill(Color.color(1, 0.1, 0.2 ));
+                break;
+            case -3:
+                labelNoteOverview.setText("Max length of note is 200 characters");
+                labelNoteOverview.setTextFill(Color.color(1, 0.1, 0.2 ));
+                break;
+            default:
+                labelNoteOverview.setText("Something went wrong");
+                labelNoteOverview.setTextFill(Color.color(1, 0.1, 0.2 ));
+                controllerLogger.error("Default case log at addNoteOnClick(); case: " + executionCode);
+                break;
+        }
+        controllerLogger.trace("Passed through addNoteOnClick() with code: " + executionCode);
     }
-    public void updateNote(){
-
+    public void updateNoteOnClick() throws SQLException {
+        String modifier = "updateNote";
+        int executionCode = logicCrudNotes.updateNote(modifier, inputNoteOverview, inputNoteID, database, logicApp.getSelectedMeeting());
+        switch (executionCode){
+            case 0:
+                labelNoteOverview.setText("Note ID: " + inputNoteID.getText() + " updated");
+                labelNoteOverview.setTextFill(Color.color(0, 0.9, 0.2));
+                showNotes(logicApp.getSelectedMeeting().getID());
+                break;
+            case -1:
+                labelNoteOverview.setText("No meeting selected, select a meeting first");
+                labelNoteOverview.setTextFill(Color.color(1, 0.1, 0.2 ));
+                break;
+            case -2:
+                labelNoteOverview.setText("Input field is empty, cannot update note");
+                labelNoteOverview.setTextFill(Color.color(1, 0.1, 0.2 ));
+                break;
+            case -3:
+                labelNoteOverview.setText("Max length of note is 200 characters");
+                labelNoteOverview.setTextFill(Color.color(1, 0.1, 0.2 ));
+                break;
+            case -4:
+                labelNoteOverview.setText("ID input is empty, enter correct noteID first");
+                labelNoteOverview.setTextFill(Color.color(1, 0.1, 0.2 ));
+                break;
+            case -5:
+                labelNoteOverview.setText("Error! Note with given ID not found ");
+                labelNoteOverview.setTextFill(Color.color(1, 0.1, 0.2 ));
+                break;
+            default:
+                labelNoteOverview.setText("Something went wrong");
+                labelNoteOverview.setTextFill(Color.color(1, 0.1, 0.2 ));
+                controllerLogger.error("Default case log at updateNote(); case: " + executionCode);
+                break;
+        }
+        controllerLogger.trace("Passed through updateNoteOnClick() with code: " + executionCode);
     }
-    public void deleteNote(){
-
+    public void deleteNoteOnClick(){
+        String modifier = "deleteNote";
+        int executionCode = logicCrudNotes.deleteNote(modifier, inputNoteID, database, logicApp.getSelectedMeeting());
+        switch (executionCode){
+            case 0:
+                labelNoteOverview.setText("Note with ID: " + inputNoteID.getText() + " deleted: " + logicApp.getSelectedMeeting().getID());
+                labelNoteOverview.setTextFill(Color.color(0, 0.9, 0.2));
+                showNotes(logicApp.getSelectedMeeting().getID());
+                break;
+            case -1:
+                labelNoteOverview.setText("No meeting selected, select a meeting first");
+                labelNoteOverview.setTextFill(Color.color(1, 0.1, 0.2 ));
+                break;
+            case -2:
+                labelNoteOverview.setText("ID input filled incorrectly");
+                labelNoteOverview.setTextFill(Color.color(1, 0.1, 0.2 ));
+                break;
+            default:
+                labelNoteOverview.setText("Something went wrong");
+                labelNoteOverview.setTextFill(Color.color(1, 0.1, 0.2 ));
+                controllerLogger.error("Default case log at deleteNote(); case: " + executionCode);
+                break;
+        }
+        controllerLogger.trace("Passed through deleteNoteOnClick() with code: " + executionCode);
     }
-
 }
 
 /*

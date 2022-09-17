@@ -115,18 +115,34 @@ public class DB {
         }
     }
     public boolean updateMeeting(String query) throws SQLException {
-        int rows;
-        Connection conn = getConnection();
-        Statement statement;
-        statement = conn.createStatement();
-        rows = statement.executeUpdate(query);
-        return rows == 1;
+        return checkUpdate(query);
     }
     public void deleteMeeting(String queryNote, String queryMeeting){
         //deleting the entries from the note table first
         execute(queryNote);
         //deleting the parent meeting
         execute(queryMeeting);
+    }
+
+    ///////////Notes
+    public void addNote(String query){
+        execute(query);
+    }
+    public boolean updateNote(String query) throws SQLException {
+        return checkUpdate(query);
+    }
+    public void deleteNote(String query){
+        execute(query);
+    }
+
+
+    public boolean checkUpdate(String query) throws SQLException {
+        int rows;
+        Connection conn = getConnection();
+        Statement statement;
+        statement = conn.createStatement();
+        rows = statement.executeUpdate(query);
+        return rows == 1;
     }
 }
 

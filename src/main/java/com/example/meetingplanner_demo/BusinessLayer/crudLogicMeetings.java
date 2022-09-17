@@ -9,8 +9,8 @@ import org.apache.logging.log4j.Logger;
 
 import java.sql.SQLException;
 
-public class crudLogic {
-    public Logger crudLogicLogger = LogManager.getLogger(crudLogic.class.getName());
+public class crudLogicMeetings {
+    public Logger crudMeetingsLogger = LogManager.getLogger(crudLogicMeetings.class.getName());
     private final appLogic logicApp = new appLogic();
 
     public void createMeeting(TextField title, DatePicker startDate, TextField startTime, DatePicker endDate,
@@ -22,7 +22,7 @@ public class crudLogic {
                 + "','" + formattedEndDate + "','" + endTime.getText() + "','" + agenda.getText() + "')";
         database.addMeeting(query, title.getText(), note.getText());
 
-        crudLogicLogger.trace("Meeting added to database");
+        crudMeetingsLogger.trace("Meeting added to database");
     }
     public boolean updateMeeting(TextField ID, TextField title, DatePicker start, TextField startTime,
                               DatePicker end, TextField endTime, TextArea agenda, DB database) throws SQLException {
@@ -69,6 +69,7 @@ public class crudLogic {
                 }
                 break;
             default:
+                crudMeetingsLogger.error("Default case hit at crudMeetingValidator(), case: " + modifier);
                 break;
         }
         return answerCode;
