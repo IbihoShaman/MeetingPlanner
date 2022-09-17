@@ -1,11 +1,11 @@
 package com.example.meetingplanner_demo.ViewModels;
 
-import com.example.meetingplanner_demo.*;
+import com.example.meetingplanner_demo.BusinessLayer.appLogic;
 import com.example.meetingplanner_demo.BusinessLayer.configurationLogic;
+import com.example.meetingplanner_demo.BusinessLayer.crudLogic;
 import com.example.meetingplanner_demo.DataAccessLayer.DB;
 import com.example.meetingplanner_demo.Models.Meetings;
 import com.example.meetingplanner_demo.Models.Notes;
-import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -13,22 +13,12 @@ import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.paint.Color;
 
-import com.itextpdf.io.font.constants.StandardFonts;
-import com.itextpdf.kernel.font.PdfFontFactory;
-import com.itextpdf.kernel.pdf.*;
-import com.itextpdf.layout.Document;
-import com.itextpdf.layout.element.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.io.IOException;
 import java.sql.*;
 import java.net.URL;
-import java.time.LocalDate;
-import java.time.LocalTime;
-import java.time.format.DateTimeFormatter;
-import java.time.format.DateTimeParseException;
-import java.time.format.ResolverStyle;
 import java.util.ResourceBundle;
 
 public class Controller1 implements Initializable {
@@ -100,62 +90,44 @@ public class Controller1 implements Initializable {
     @FXML
     private Button buttonGeneratePdf;
 
-    public static Logger logger = LogManager.getLogger(Main.class.getName());
-    DB database = new DB(configurationLogic.getConfiguration("connectionString"));
-    private Meetings selectedMeeting;
-    public static final String TARGET_PDF = configurationLogic.getConfiguration("PdfName");
 
-    //populates the table view on launch
-    @Override
+    private final Logger controllerLogger = LogManager.getLogger(Controller1.class.getName());
+    private final appLogic logicApp = new appLogic();
+    private final crudLogic logicCrud = new crudLogic();
+    DB database = new DB(configurationLogic.getConfiguration("connectionString"));
+    //private Meetings selectedMeeting;
+
+    //populates the meeting table view on launch
     public void initialize(URL url, ResourceBundle resourceBundle) {
-        //getConnection();
         showMeetings();
     }
 
-    public void generatePdf() throws IOException {
-        String modifier = "generatePdf";
-        switch (formValidator(modifier)){
+    //calls appLogic function to fetch list of all Meetings from the database and prints them in the Meeting table view
+    public void showMeetings(){
+        ObservableList<Meetings> list = logicApp.getMeetingList(database);
+        colID.setCellValueFactory(new PropertyValueFactory<>("ID"));
+        colTitle.setCellValueFactory(new PropertyValueFactory<>("title"));
+        colStart.setCellValueFactory(new PropertyValueFactory<>("startDate"));
+        colEnd.setCellValueFactory(new PropertyValueFactory<>("endDate"));
+
+        tableMeetings.setItems(list);
+        controllerLogger.trace("Meeting table populated");
+    }
+    //calls appLogic function to fetch list of all Notes from the database and prints them in the Note table view
+    public void showNotes(int parentID){
+        ObservableList<Notes> list = logicApp.getNotesList(parentID, database);
+        colNoteID.setCellValueFactory(new PropertyValueFactory<>("noteID"));
+        colParentID.setCellValueFactory(new PropertyValueFactory<>("parentMeetingID"));
+        colNoteText.setCellValueFactory(new PropertyValueFactory<>("noteText"));
+
+        tableNotes.setItems(list);
+    }
+
+    public void generatePdfOnClick() throws IOException {
+        int answerCode;
+        answerCode = logicApp.generatePdf(database);
+        switch (answerCode){
             case 0:
-                PdfWriter writer = new PdfWriter(TARGET_PDF);
-                PdfDocument pdf = new PdfDocument(writer);
-                Document document = new Document(pdf);
-
-                Paragraph meetingHeader = new Paragraph(selectedMeeting.getTitle() + " - Meeting Overview")
-                        .setFont(PdfFontFactory.createFont(StandardFonts.COURIER))
-                        .setFontSize(24)
-                        .setBold()
-                        .setPaddingLeft(50);
-                document.add(meetingHeader);
-                Paragraph meetingSchedule = new Paragraph("Meeting kick-off: " + selectedMeeting.getStartDate() + " " + selectedMeeting.getStartTime() +
-                                                                "\n Meeting end: " + selectedMeeting.getEndDate() + " " + selectedMeeting.getEndTime())
-                        .setBold()
-                        .setFontSize(16);
-                document.add(meetingSchedule);
-
-                Paragraph meetingAgendaHeader = new Paragraph("Meeting Agenda: \n")
-                        .setBold()
-                        .setFontSize(16);
-                document.add(meetingAgendaHeader);
-                document.add(new Paragraph(selectedMeeting.getAgenda()).setFontSize(14));
-
-                Paragraph listHeader = new Paragraph("Meeting Notes")
-                        .setFontSize(16)
-                        .setBold();
-                List list = new List()
-                        .setSymbolIndent(12)
-                        .setListSymbol("\u2022")
-                        .setFontSize(14);
-                ObservableList<Notes> listNotes = getNotesList(selectedMeeting.getID());
-                if(listNotes.isEmpty()){
-                    list.add(new ListItem("No notes appended to this meeting yet"));
-                } else {
-                    listNotes.forEach((Notes) -> list.add(Notes.getNoteText()));
-                }
-                document.add(listHeader);
-                document.add(list);
-
-                //document.add(new AreaBreak());
-                document.close();
                 labelPdf.setText("PDF successfully created");
                 labelPdf.setTextFill(Color.color(0, 0.9, 0.2));
                 break;
@@ -164,112 +136,48 @@ public class Controller1 implements Initializable {
                 labelPdf.setTextFill(Color.color(1, 0.1, 0.2 ));
                 break;
             default:
-                logger.error("Default case log at generatePdf(); case: " + formValidator(modifier));
+                labelPdf.setText("Something went wrong");
+                labelPdf.setTextFill(Color.color(1, 0.1, 0.2 ));
+                controllerLogger.error("Default case log at generatePdf(); case: " + answerCode);
                 break;
         }
     }
+    public void displayMeetingData(){
+        logicApp.setSelectedMeeting(tableMeetings.getSelectionModel().getSelectedItem());
 
-    //reads all meeting entries in the database into an observable list and returns it
-    public ObservableList<Meetings> getMeetingList(){
-        ObservableList<Meetings> meetingList = FXCollections.observableArrayList();
-        Connection conn = database.getConnection();
-        String query = "SELECT * FROM meetinglist";
-        Statement statement;
-        ResultSet results;
-        try{
-            statement = conn.createStatement();
-            results = statement.executeQuery(query);
-            Meetings meeting;
-            while(results.next()){
-                meeting = new Meetings(results.getInt("meetingID"), results.getString("title"), results.getString("startDate"), results.getString("startTime"), results.getString("endDate"),
-                                        results.getString("endTime"), results.getString("agenda"));
-                meetingList.add(meeting);
-            }
-        }catch(Exception e){
-            logger.error("Could not fetch meetings from database");
-            e.printStackTrace();
-        }
-        logger.trace("Meeting list successfully filled with meetings");
-        return meetingList;
+        inputID.setText("" + logicApp.getSelectedMeeting().getID());
+        inputTitle.setText(logicApp.getSelectedMeeting().getTitle());
+        inputStart.setValue(logicApp.parseDate(logicApp.getSelectedMeeting().getStartDate()));
+        inputStartTime.setText(logicApp.getSelectedMeeting().getStartTime());
+        inputEnd.setValue(logicApp.parseDate(logicApp.getSelectedMeeting().getEndDate()));
+        inputEndTime.setText(logicApp.getSelectedMeeting().getEndTime());
+        inputAgenda.setText(logicApp.getSelectedMeeting().getAgenda());
+
+        labelTitle.setText("TITLE : " + logicApp.getSelectedMeeting().getTitle());
+        labelStart.setText("FROM : " + logicApp.getSelectedMeeting().getStartDate() + " " + logicApp.getSelectedMeeting().getStartTime());
+        labelEnd.setText("TO : " + logicApp.getSelectedMeeting().getEndDate() + " " + logicApp.getSelectedMeeting().getEndTime());
+        labelAgenda.setText("AGENDA : \n" + logicApp.getSelectedMeeting().getAgenda());
+
+        showNotes(logicApp.getSelectedMeeting().getID());
+    }
+    public void displayNoteData(){
+        Notes selectedNote = tableNotes.getSelectionModel().getSelectedItem();
+        inputNoteID.setText("" + selectedNote.getNoteID());
+        inputNoteOverview.setText(selectedNote.getNoteText());
     }
 
-    //reads all note entries in the database with correct parent ID into an observable list and returns it
-    public ObservableList<Notes> getNotesList(int parentID){
-        ObservableList<Notes> notesList = FXCollections.observableArrayList();
-        Connection conn = database.getConnection();
-        String query = "SELECT * FROM meetingnotes WHERE meetingID = " + parentID;
-        Statement statement;
-        ResultSet results;
-        try{
-            statement = conn.createStatement();
-            results = statement.executeQuery(query);
-            Notes note;
-            while(results.next()){
-                //System.out.println("Note Text -----> " + results.getString("noteText"));
-                note = new Notes(results.getInt("noteID"), results.getInt("meetingID"), results.getString("noteText"));
-                notesList.add(note);
-            }
-        }catch(Exception e){
-            logger.error("Could not fetch notes from database");
-            e.printStackTrace();
-        }
-        logger.trace("Note list successfully filled with notes");
-        return notesList;
-    }
-///////////////////////////////////Meeting functionality/////////////////////////////////////
-
-    //prints the data of all meetings from the observable list into the correct columns of the table view
-    public void showMeetings(){
-        ObservableList<Meetings> list = getMeetingList();
-        colID.setCellValueFactory(new PropertyValueFactory<>("ID"));
-        colTitle.setCellValueFactory(new PropertyValueFactory<>("title"));
-        colStart.setCellValueFactory(new PropertyValueFactory<>("startDate"));
-        colEnd.setCellValueFactory(new PropertyValueFactory<>("endDate"));
-
-        tableMeetings.setItems(list);
-        logger.trace("Meeting table populated");
-    }
-
-
-    //creates a meeting and calls an update for the table view data if creation was successful
-    public void createMeeting() {
+    public void createMeetingOnClick(){
         String modifier = "createMeeting";
-        switch (formValidator(modifier)){
-            //form filled out correctly, meeting created in database, table view updated
+        int answerCode = logicCrud.crudMeetingValidator(modifier, inputID, inputTitle, inputStart,
+                inputStartTime, inputEnd, inputEndTime, inputAgenda, inputNote);
+        switch (answerCode){
             case 0:
-                int currentID = 0;
-                String formattedStartDate = formatStart();
-                String formattedEndDate = formatEnd();
-                //insert data into meetinglist table (notes added to different table)
-                String query = "INSERT INTO meetinglist (title, startDate, startTime, endDate, endTime, agenda) VALUES ('" + inputTitle.getText() + "','" + formattedStartDate + "','" + inputStartTime.getText()
-                        + "','" + formattedEndDate + "','" + inputEndTime.getText() + "','" + inputAgenda.getText() + "')";
-                execute(query);
-                ////Adding appended note to meetingNotes table/////
-                //get meeting ID to which the note will be appended (suboptimal solution might change later)
-                Connection conn = database.getConnection();
-                query = "SELECT meetingID FROM meetinglist WHERE title = '" + inputTitle.getText() + "'";
-                Statement statement;
-                try {
-                    statement = conn.createStatement();
-                    ResultSet result;
-                    result = statement.executeQuery(query);
-                    while (result.next()) {
-                        currentID = result.getInt(1);
-                    }
-                }catch (Exception e){
-                    logger.error("Error fetching meetingID in createMeeting()");
-                    e.printStackTrace();
-                }
-                //insert note with corresponding meeting ID
-                if(!inputNote.getText().isEmpty()) {
-                    query = "INSERT INTO meetingnotes (noteText, meetingID) VALUES ('" + inputNote.getText() + "','" + currentID + "')";
-                    execute(query);
-                }
+                logicCrud.createMeeting(inputTitle, inputStart, inputStartTime, inputEnd, inputEndTime, inputAgenda, inputNote, database);
                 labelForm.setText("Meeting successfully created");
                 labelForm.setTextFill(Color.color(0, 0.9, 0.2));
-                logger.trace("Meeting added to database");
+                controllerLogger.trace("Meeting added to database");
+                showMeetings();
                 break;
-            //form not filled out correctly
             case -1:
                 labelForm.setText("Error! One or more fields are not filled out");
                 labelForm.setTextFill(Color.color(1, 0.1, 0.2 ));
@@ -281,61 +189,64 @@ public class Controller1 implements Initializable {
             default:
                 labelForm.setText("Something went wrong");
                 labelForm.setTextFill(Color.color(1, 0.1, 0.2 ));
-                logger.error("Default case log at createMeeting(); case: " + formValidator(modifier));
+                controllerLogger.error("Default case log at createMeeting(); case: " + answerCode);
                 break;
         }
+        controllerLogger.trace("Passed through createMeetingOnClick() with code: " + answerCode);
     }
-    // updates the info of a meeting based on the entered ID and meeting data
-    public void updateMeeting() throws SQLException {
+    public void updateMeetingOnClick() throws SQLException {
         String modifier = "updateMeeting";
-        switch (formValidator(modifier)){
-            //filled out correctly, meeting updated, table view updated
+        int answerCode = logicCrud.crudMeetingValidator(modifier, inputID, inputTitle, inputStart,
+                inputStartTime, inputEnd, inputEndTime, inputAgenda, inputNote);
+        switch (answerCode){
             case 0:
-                String formattedStartDate = formatStart();
-                String formattedEndDate = formatEnd();
-                String query = "UPDATE meetinglist SET title = '" + inputTitle.getText() + "', startDate = '" + formattedStartDate + "', startTime = '" + inputStartTime.getText() + "', endDate = '" + formattedEndDate + "', endTime = '" + inputEndTime.getText() + "', agenda = '" + inputAgenda.getText() +
-                        "' WHERE meetingID = " + inputID.getText();
-                if(!checkRows(query)){
-                    labelForm.setText("No meeting with given ID found");
-                    labelForm.setTextFill(Color.color(1, 0.1, 0.2 ));
-                } else {
+                if(logicCrud.updateMeeting(inputID, inputTitle, inputStart,
+                        inputStartTime, inputEnd, inputEndTime, inputAgenda, database))
+                {
                     showMeetings();
                     labelForm.setText("Meeting successfully updated");
                     labelForm.setTextFill(Color.color(0, 0.9, 0.2));
+                } else {
+                    labelForm.setText("No meeting with given ID found");
+                    labelForm.setTextFill(Color.color(1, 0.1, 0.2 ));
                 }
                 break;
-            //ID not filled in, meeting not updated
             case -1:
                 labelForm.setText("Error! ID field filled incorrectly");
                 labelForm.setTextFill(Color.color(1, 0.1, 0.2 ));
                 break;
-            //ID filled but form data missing, meeting not updated
             case -2:
-                labelForm.setText("Error! One or more input fields not filled out");
+                labelForm.setText("Error! One or more fields are not filled out");
+                labelForm.setTextFill(Color.color(1, 0.1, 0.2 ));
+                break;
+            case -3:
+                //user tried to enter a note through the meeting form -> meeting updated but note not added
+                logicCrud.updateMeeting(inputID, inputTitle, inputStart, inputStartTime,
+                                        inputEnd, inputEndTime, inputAgenda, database);
+                showMeetings();
+                labelForm.setText("Warning! Note cannot be added in this formulary");
+                labelForm.setTextFill(Color.color(1, 0.6 ,0  ));
+                break;
+            case -4:
+                labelForm.setText("Error! Incorrect time format entered");
                 labelForm.setTextFill(Color.color(1, 0.1, 0.2 ));
                 break;
             default:
                 labelForm.setText("Something went wrong");
                 labelForm.setTextFill(Color.color(1, 0.1, 0.2 ));
-                logger.error("Default case log at updateMeeting()");
+                controllerLogger.error("Default case log at updateMeeting(); case: " + answerCode);
                 break;
         }
+        controllerLogger.trace("Passed through updateMeetingOnClick() with code: " + answerCode);
     }
-    //deleted a meeting based on entered meeting ID
-    public void deleteMeeting(){
+    public void deleteMeetingOnClick(){
         String modifier = "deleteMeeting";
-        switch (formValidator(modifier)){
-            //meeting is deleted from db, table view updated
+        int answerCode = logicCrud.crudMeetingValidator(modifier, inputID, inputTitle, inputStart,
+                inputStartTime, inputEnd, inputEndTime, inputAgenda, inputNote);
+        switch (answerCode){
             case 0:
-                String query = "DELETE FROM meetingNotes WHERE meetingID = " + inputID.getText();
-                execute(query);
-                query = "DELETE FROM meetinglist WHERE meetingID = " + inputID.getText();
-                execute(query);
-                showMeetings();
-                labelForm.setText("Meeting successfully deleted");
-                labelForm.setTextFill(Color.color(0, 0.9, 0.2));
+                logicCrud.deleteMeeting(inputID, database);
                 break;
-            //user did not fill ID input, meeting is not deleted
             case -1:
                 labelForm.setText("Error! ID field filled incorrectly");
                 labelForm.setTextFill(Color.color(1, 0.1, 0.2 ));
@@ -343,40 +254,26 @@ public class Controller1 implements Initializable {
             default:
                 labelForm.setText("Something went wrong");
                 labelForm.setTextFill(Color.color(1, 0.1, 0.2 ));
-                logger.error("Default case log at deleteMeeting(); case: " + formValidator(modifier));
+                controllerLogger.error("Default case log at createMeeting(); case: " + answerCode);
                 break;
         }
+        controllerLogger.trace("Passed through deleteMeetingOnClick() with code: " + answerCode);
     }
 
-    public void displayMeetingData(){
-        selectedMeeting = tableMeetings.getSelectionModel().getSelectedItem();
+    public void addNote(){
 
-        inputID.setText("" + selectedMeeting.getID());
-        inputTitle.setText(selectedMeeting.getTitle());
-        inputStart.setValue(parseDate(selectedMeeting.getStartDate()));
-        inputStartTime.setText(selectedMeeting.getStartTime());
-        inputEnd.setValue(parseDate(selectedMeeting.getEndDate()));
-        inputEndTime.setText(selectedMeeting.getEndTime());
-        inputAgenda.setText(selectedMeeting.getAgenda());
+    }
+    public void updateNote(){
 
-        labelTitle.setText("TITLE : " + selectedMeeting.getTitle());
-        labelStart.setText("FROM : " + selectedMeeting.getStartDate() + " " + selectedMeeting.getStartTime());
-        labelEnd.setText("TO : " + selectedMeeting.getEndDate() + " " + selectedMeeting.getEndTime());
-        labelAgenda.setText("AGENDA : \n" + selectedMeeting.getAgenda());
+    }
+    public void deleteNote(){
 
-        showNotes(selectedMeeting.getID());
     }
 
+}
+
+/*
 ////////////////////////Note functionality///////////////////////////
-
-    public void showNotes(int parentID){
-        ObservableList<Notes> list = getNotesList(parentID);
-        colNoteID.setCellValueFactory(new PropertyValueFactory<>("noteID"));
-        colParentID.setCellValueFactory(new PropertyValueFactory<>("parentMeetingID"));
-        colNoteText.setCellValueFactory(new PropertyValueFactory<>("noteText"));
-
-        tableNotes.setItems(list);
-    }
 
     public void displayNoteData(){
         Notes selectedNote = tableNotes.getSelectionModel().getSelectedItem();
@@ -482,19 +379,7 @@ public class Controller1 implements Initializable {
 
 ///////////////////////////////Additional functionality//////////////////////////////////////
 
-    private void execute(String query) {
-        Connection connection = database.getConnection();
-        Statement statement;
-        try {
-            statement = connection.createStatement();
-            statement.executeUpdate(query);
-        }catch(Exception e){
-            logger.fatal("Query execution failed");
-            e.printStackTrace();
-        }
-        logger.trace("Query execution successful");
-        showMeetings();
-    }
+
     
     private int formValidator(String modifier){
         int answerCode = 0;
@@ -564,47 +449,4 @@ public class Controller1 implements Initializable {
         logger.trace("Modifier passed through form validator with answerCode: " + answerCode + " on case: " + modifier);
         return answerCode;
     }
-
-    public boolean checkRows(String query) throws SQLException {
-        int rows;
-        Connection conn = database.getConnection();
-        Statement statement;
-        statement = conn.createStatement();
-        rows = statement.executeUpdate(query);
-        return rows != 0;
-    }
-    public Boolean checkInt(String input){
-        try{
-            Integer.parseInt(input);
-        }catch(NumberFormatException nfe){
-            return false;
-        }
-        return true;
-    }
-    public LocalDate parseDate(String date){
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-        return LocalDate.parse(date, formatter);
-    }
-    public boolean parseTime(String time){
-        try {
-            DateTimeFormatter strictTimeFormatter = DateTimeFormatter.ofPattern("HH:mm")
-                    .withResolverStyle(ResolverStyle.STRICT);
-            LocalTime.parse(time, strictTimeFormatter);
-            System.out.println("Valid time string: " + time);
-            return true;
-        } catch (DateTimeParseException | NullPointerException e) {
-
-            logger.info("Invalid time input in parseTime()");
-            System.out.println("Invalid time string: " + time);
-        }
-        return false;
-    }
-    public String formatStart(){
-        LocalDate startDate = inputStart.getValue();
-        return startDate.format(DateTimeFormatter.ofPattern("dd/MM/yyyy"));
-    }
-    public String formatEnd(){
-        LocalDate endDate = inputEnd.getValue();
-        return endDate.format(DateTimeFormatter.ofPattern("dd/MM/yyyy"));
-    }
-}
+*/

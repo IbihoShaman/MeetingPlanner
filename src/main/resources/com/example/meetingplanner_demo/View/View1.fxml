@@ -91,7 +91,7 @@
             </GridPane>
             <TextArea fx:id="inputAgenda" prefHeight="74.0" prefWidth="238.0" />
             <TextArea fx:id="inputNote" prefHeight="40.0" prefWidth="254.0" />
-            <Button fx:id="buttonCreate" mnemonicParsing="false" onAction="#createMeeting" text="Create Meeting">
+            <Button fx:id="buttonCreate" mnemonicParsing="false" onAction="#createMeetingOnClick" text="Create Meeting">
                <graphic>
                   <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
                      <image>
@@ -101,7 +101,7 @@
                </graphic></Button>
             <HBox prefHeight="38.0" prefWidth="222.0" spacing="10.0">
                <children>
-                  <Button fx:id="buttonUpdate" mnemonicParsing="false" onAction="#updateMeeting" prefHeight="26.0" prefWidth="81.0" text="Update">
+                  <Button fx:id="buttonUpdate" mnemonicParsing="false" onAction="#updateMeetingOnClick" prefHeight="26.0" prefWidth="81.0" text="Update">
                      <graphic>
                         <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
                            <image>
@@ -127,7 +127,7 @@
             <TableColumn fx:id="colEnd" prefWidth="96.0" text="End" />
         </columns>
       </TableView>
-      <Button fx:id="buttonDelete" layoutX="318.0" layoutY="348.0" mnemonicParsing="false" onAction="#deleteMeeting" text="Delete">
+      <Button fx:id="buttonDelete" layoutX="318.0" layoutY="348.0" mnemonicParsing="false" onAction="#deleteMeetingOnClick" text="Delete">
          <graphic>
             <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
                <image>
@@ -239,7 +239,7 @@
             <Font name="System Bold" size="14.0" />
          </font>
       </Label>
-      <Button fx:id="buttonGeneratePdf" layoutX="694.0" layoutY="24.0" mnemonicParsing="false" onAction="#generatePdf" prefHeight="30.0" prefWidth="122.0" text="Generate PDF">
+      <Button fx:id="buttonGeneratePdf" layoutX="694.0" layoutY="24.0" mnemonicParsing="false" onAction="#generatePdfOnClick" prefHeight="30.0" prefWidth="122.0" text="Generate PDF">
          <graphic>
             <ImageView fitHeight="24.0" fitWidth="22.0" pickOnBounds="true" preserveRatio="true">
                <image>
