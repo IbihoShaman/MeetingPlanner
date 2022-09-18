@@ -14,12 +14,12 @@ public class crudLogicNotes {
     private final appLogic logicApp = new appLogic();
     private int answerCode = 0;
 
-    public int addNote(String modifier, TextArea noteText, DB database, Meetings selectedMeeting){
+    public int addNote(String modifier, TextArea noteText, Meetings selectedMeeting){
         int validatorCode = crudNoteValidator(modifier, noteText, null, selectedMeeting);
         switch(validatorCode){
             case 0:
                 String query = "INSERT INTO meetingnotes (meetingID, noteText) VALUES ('" + selectedMeeting.getID() + "','" + noteText.getText() + "')";
-                database.addNote(query);
+                logicApp.getDatabase().addNote(query);
                 answerCode = 0;
                 break;
             case -1:
@@ -36,13 +36,14 @@ public class crudLogicNotes {
         }
         return answerCode;
     }
-    public int updateNote(String modifier, TextArea noteText, TextField noteID, DB database, Meetings selectedMeeting) throws SQLException {
+    public int updateNote(String modifier, TextArea noteText, TextField noteID, Meetings selectedMeeting) throws SQLException {
         int validatorCode = crudNoteValidator(modifier, noteText, noteID, selectedMeeting);
+        System.out.println("Validator: " + validatorCode);
         switch (validatorCode){
             case 0:
                 String query = "UPDATE meetingnotes SET noteText = '" + noteText.getText() +
                         "' WHERE noteID = " + noteID.getText();
-                if(!database.updateNote(query)){
+                if(!logicApp.getDatabase().updateNote(query)){
                     answerCode = -5;
                 }
                 break;
@@ -63,12 +64,12 @@ public class crudLogicNotes {
         }
         return answerCode;
     }
-    public int deleteNote(String modifier, TextField noteID, DB database, Meetings selectedMeeting){
+    public int deleteNote(String modifier, TextField noteID, Meetings selectedMeeting){
         int validatorCode = crudNoteValidator(modifier, null, noteID, selectedMeeting);
          switch (validatorCode){
              case 0:
                  String query = "DELETE FROM meetingnotes WHERE noteID = " + noteID.getText();
-                 database.deleteNote(query);
+                 logicApp.getDatabase().deleteNote(query);
                  answerCode = 0;
                  break;
              case -1:

@@ -22,27 +22,36 @@ import java.time.format.DateTimeParseException;
 import java.time.format.ResolverStyle;
 
 public class appLogic {
-    public Logger appLogicLogger = LogManager.getLogger(appLogic.class.getName());
+    DB database = new DB(configurationLogic.getConfiguration("connectionString"));
+    public DB getDatabase() {
+        return database;
+    }
+
+    private Logger appLogicLogger = LogManager.getLogger(appLogic.class.getName());
     private Meetings selectedMeeting;
+
+    private int selectedMeetingID;
+    public void setSelectedMeetingID(int selectedMeetingID) { this.selectedMeetingID = selectedMeetingID; }
+    public int getSelectedMeetingID() { return selectedMeetingID; }
 
     public void setSelectedMeeting(Meetings selectedMeeting){ this.selectedMeeting = selectedMeeting; }
     public Meetings getSelectedMeeting(){ return this.selectedMeeting; }
 
 
     //creates an observable list, calls database method to fill the list with entries and returns it
-    public ObservableList<Meetings> getMeetingList(DB database) {
+    public ObservableList<Meetings> getMeetingList() {
         ObservableList<Meetings> meetingList = FXCollections.observableArrayList();
         database.fetchMeetingData(meetingList);
         return meetingList;
     }
-    public ObservableList<Notes> getNotesList(int parentID, DB database){
+    public ObservableList<Notes> getNotesList(int parentID){
         ObservableList<Notes> notesList = FXCollections.observableArrayList();
         database.fetchNoteData(parentID, notesList);
         return notesList;
     }
 
     //generates a PDF report based on provided meeting object data
-    public int generatePdf(DB database) throws IOException {
+    public int generatePdf() throws IOException {
         String TARGET_PDF = configurationLogic.getConfiguration("PdfName");
         String modifier = "generatePdf";
         int resultCode = appValidator(modifier);
@@ -77,7 +86,7 @@ public class appLogic {
                         .setSymbolIndent(12)
                         .setListSymbol("\u2022")
                         .setFontSize(14);
-                ObservableList<Notes> listNotes = getNotesList(selectedMeeting.getID(), database);
+                ObservableList<Notes> listNotes = getNotesList(selectedMeeting.getID());
                 if(listNotes.isEmpty()){
                     list.add(new ListItem("No notes appended to this meeting yet"));
                 } else {

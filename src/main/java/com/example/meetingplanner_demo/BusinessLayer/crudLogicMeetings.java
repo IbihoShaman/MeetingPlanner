@@ -4,6 +4,7 @@ import com.example.meetingplanner_demo.DataAccessLayer.DB;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
+import javafx.scene.paint.Color;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -13,29 +14,82 @@ public class crudLogicMeetings {
     public Logger crudMeetingsLogger = LogManager.getLogger(crudLogicMeetings.class.getName());
     private final appLogic logicApp = new appLogic();
 
-    public void createMeeting(TextField title, DatePicker startDate, TextField startTime, DatePicker endDate,
-                              TextField endTime, TextArea agenda, TextArea note, DB database){
-        String formattedStartDate = logicApp.parseDateToString(startDate.getValue());
-        String formattedEndDate = logicApp.parseDateToString(endDate.getValue());
-        //insert data into meetinglist table (notes added to different table)
-        String query = "INSERT INTO meetinglist (title, startDate, startTime, endDate, endTime, agenda) VALUES ('" + title.getText() + "','" + formattedStartDate + "','" + startTime.getText()
-                + "','" + formattedEndDate + "','" + endTime.getText() + "','" + agenda.getText() + "')";
-        database.addMeeting(query, title.getText(), note.getText());
-
-        crudMeetingsLogger.trace("Meeting added to database");
+    public int createMeeting(String modifier, TextField title, DatePicker startDate, TextField startTime, DatePicker endDate,
+                              TextField endTime, TextArea agenda, TextArea note){
+        int answerCode = 0;
+        int validatorCode = crudMeetingValidator(modifier,null, title, startDate, startTime, endDate, endTime, agenda, note);
+        switch (validatorCode){
+            case 0:
+                String formattedStartDate = logicApp.parseDateToString(startDate.getValue());
+                String formattedEndDate = logicApp.parseDateToString(endDate.getValue());
+                //insert data into meetinglist table (notes added to different table)
+                String query = "INSERT INTO meetinglist (title, startDate, startTime, endDate, endTime, agenda) VALUES ('" + title.getText() + "','" + formattedStartDate + "','" + startTime.getText()
+                        + "','" + formattedEndDate + "','" + endTime.getText() + "','" + agenda.getText() + "')";
+                logicApp.getDatabase().addMeeting(query, title.getText(), note.getText());
+                break;
+            case -1:
+                answerCode = -1;
+                break;
+            case -2:
+                answerCode = -2;
+                break;
+            default:
+                crudMeetingsLogger.error("Default case log at createMeeting(); case: " + validatorCode);
+                break;
+        }
+        crudMeetingsLogger.trace("Passed through createMeeting() with answerCode: " + answerCode);
+        return answerCode;
     }
-    public boolean updateMeeting(TextField ID, TextField title, DatePicker start, TextField startTime,
-                              DatePicker end, TextField endTime, TextArea agenda, DB database) throws SQLException {
-        String formattedStartDate = logicApp.parseDateToString(start.getValue());
-        String formattedEndDate = logicApp.parseDateToString(end.getValue());
-        String query = "UPDATE meetinglist SET title = '" + title.getText() + "', startDate = '" + formattedStartDate + "', startTime = '" + startTime.getText() + "', endDate = '" + formattedEndDate + "', endTime = '" + endTime.getText() + "', agenda = '" + agenda.getText() +
-                "' WHERE meetingID = " + ID.getText();
-        return (database.updateMeeting(query));
+    public int updateMeeting(String modifier, TextField ID, TextField title, DatePicker start, TextField startTime,
+                              DatePicker end, TextField endTime, TextArea agenda, TextArea noteText) throws SQLException {
+        int validatorCode = crudMeetingValidator(modifier, ID, title, start, startTime, end, endTime, agenda, noteText);
+        int answerCode = 0;
+        switch (validatorCode){
+            case 0:
+                String formattedStartDate = logicApp.parseDateToString(start.getValue());
+                String formattedEndDate = logicApp.parseDateToString(end.getValue());
+                String query = "UPDATE meetinglist SET title = '" + title.getText() + "', startDate = '" + formattedStartDate + "', startTime = '" + startTime.getText() + "', endDate = '" + formattedEndDate + "', endTime = '" + endTime.getText() + "', agenda = '" + agenda.getText() +
+                        "' WHERE meetingID = " + ID.getText();
+                if(!logicApp.getDatabase().updateMeeting(query)){
+                    answerCode = -5;
+                }
+                break;
+            case -1:
+                answerCode = -1;
+                break;
+            case -2:
+                answerCode = -2;
+                break;
+            case -3:
+                answerCode = -3;
+                break;
+            case -4:
+                answerCode = -4;
+                break;
+            default:
+                crudMeetingsLogger.error("Default case log at updateMeeting(); case: " + validatorCode);
+                break;
+        }
+        return answerCode;
     }
-    public void deleteMeeting(TextField inputID, DB database){
-        String queryNote = "DELETE FROM meetingNotes WHERE meetingID = " + inputID.getText();
-        String queryMeeting = "DELETE FROM meetinglist WHERE meetingID = " + inputID.getText();
-        database.deleteMeeting(queryNote, queryMeeting);
+    public int deleteMeeting(String modifier, TextField inputID){
+        int validatorCode = crudMeetingValidator(modifier, inputID, null, null,
+                null, null, null, null, null);
+        int answerCode = 0;
+        switch (validatorCode){
+            case 0:
+                String queryNote = "DELETE FROM meetingNotes WHERE meetingID = " + inputID.getText();
+                String queryMeeting = "DELETE FROM meetinglist WHERE meetingID = " + inputID.getText();
+                logicApp.getDatabase().deleteMeeting(queryNote, queryMeeting);
+                break;
+            case -1:
+                answerCode = -1;
+                break;
+            default:
+                crudMeetingsLogger.error("Default case log at deleteMeeting(); case: " + validatorCode);
+                break;
+            }
+        return answerCode;
     }
 
     public int crudMeetingValidator(String modifier, TextField inputID, TextField title, DatePicker start, TextField startTime,

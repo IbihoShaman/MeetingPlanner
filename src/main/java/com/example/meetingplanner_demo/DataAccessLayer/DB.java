@@ -87,7 +87,7 @@ public class DB {
         }
         DBlogger.trace("Note list successfully filled with notes");
     }
-
+    ////Meetings
     public void addMeeting(String query, String title, String note){
         //adds meeting into meetingList DB table
         execute(query);
@@ -111,7 +111,7 @@ public class DB {
             }
             // inserts note into noteList table
             query = "INSERT INTO meetingnotes (noteText, meetingID) VALUES ('" + note + "','" + currentID + "')";
-            execute(query);
+            addNote(query);
         }
     }
     public boolean updateMeeting(String query) throws SQLException {
@@ -134,7 +134,6 @@ public class DB {
     public void deleteNote(String query){
         execute(query);
     }
-
 
     public boolean checkUpdate(String query) throws SQLException {
         int rows;
