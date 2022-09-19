@@ -1,10 +1,8 @@
 package com.example.meetingplanner_demo.BusinessLayer;
 
-import com.example.meetingplanner_demo.DataAccessLayer.DB;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
-import javafx.scene.paint.Color;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -25,7 +23,7 @@ public class crudLogicMeetings {
                 //insert data into meetinglist table (notes added to different table)
                 String query = "INSERT INTO meetinglist (title, startDate, startTime, endDate, endTime, agenda) VALUES ('" + title.getText() + "','" + formattedStartDate + "','" + startTime.getText()
                         + "','" + formattedEndDate + "','" + endTime.getText() + "','" + agenda.getText() + "')";
-                logicApp.getDatabase().addMeeting(query, title.getText(), note.getText());
+                logicApp.getDBMeetings().addMeeting(query, title.getText(), note.getText());
                 break;
             case -1:
                 answerCode = -1;
@@ -50,7 +48,7 @@ public class crudLogicMeetings {
                 String formattedEndDate = logicApp.parseDateToString(end.getValue());
                 String query = "UPDATE meetinglist SET title = '" + title.getText() + "', startDate = '" + formattedStartDate + "', startTime = '" + startTime.getText() + "', endDate = '" + formattedEndDate + "', endTime = '" + endTime.getText() + "', agenda = '" + agenda.getText() +
                         "' WHERE meetingID = " + ID.getText();
-                if(!logicApp.getDatabase().updateMeeting(query)){
+                if(!logicApp.getDBMeetings().updateMeeting(query)){
                     answerCode = -5;
                 }
                 break;
@@ -80,7 +78,7 @@ public class crudLogicMeetings {
             case 0:
                 String queryNote = "DELETE FROM meetingNotes WHERE meetingID = " + inputID.getText();
                 String queryMeeting = "DELETE FROM meetinglist WHERE meetingID = " + inputID.getText();
-                logicApp.getDatabase().deleteMeeting(queryNote, queryMeeting);
+                logicApp.getDBMeetings().deleteMeeting(queryNote, queryMeeting);
                 break;
             case -1:
                 answerCode = -1;

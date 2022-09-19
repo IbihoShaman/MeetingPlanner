@@ -1,7 +1,6 @@
 package com.example.meetingplanner_demo.BusinessLayer;
 
-import com.example.meetingplanner_demo.DataAccessLayer.DB;
-import com.example.meetingplanner_demo.Models.Meetings;
+import com.example.meetingplanner_demo.Model.Meetings;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import org.apache.logging.log4j.LogManager;
@@ -19,7 +18,7 @@ public class crudLogicNotes {
         switch(validatorCode){
             case 0:
                 String query = "INSERT INTO meetingnotes (meetingID, noteText) VALUES ('" + selectedMeeting.getID() + "','" + noteText.getText() + "')";
-                logicApp.getDatabase().addNote(query);
+                logicApp.getDBNotes().addNote(query);
                 answerCode = 0;
                 break;
             case -1:
@@ -43,7 +42,7 @@ public class crudLogicNotes {
             case 0:
                 String query = "UPDATE meetingnotes SET noteText = '" + noteText.getText() +
                         "' WHERE noteID = " + noteID.getText();
-                if(!logicApp.getDatabase().updateNote(query)){
+                if(!logicApp.getDBNotes().updateNote(query)){
                     answerCode = -5;
                 }
                 break;
@@ -69,7 +68,7 @@ public class crudLogicNotes {
          switch (validatorCode){
              case 0:
                  String query = "DELETE FROM meetingnotes WHERE noteID = " + noteID.getText();
-                 logicApp.getDatabase().deleteNote(query);
+                 logicApp.getDBNotes().deleteNote(query);
                  answerCode = 0;
                  break;
              case -1:

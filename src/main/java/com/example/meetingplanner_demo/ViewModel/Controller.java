@@ -1,28 +1,25 @@
-package com.example.meetingplanner_demo.ViewModels;
+package com.example.meetingplanner_demo.ViewModel;
 
 import com.example.meetingplanner_demo.BusinessLayer.appLogic;
-import com.example.meetingplanner_demo.BusinessLayer.configurationLogic;
 import com.example.meetingplanner_demo.BusinessLayer.crudLogicMeetings;
 import com.example.meetingplanner_demo.BusinessLayer.crudLogicNotes;
-import com.example.meetingplanner_demo.DataAccessLayer.DB;
-import com.example.meetingplanner_demo.Models.Meetings;
-import com.example.meetingplanner_demo.Models.Notes;
+import com.example.meetingplanner_demo.Model.Meetings;
+import com.example.meetingplanner_demo.Model.Notes;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.paint.Color;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.io.IOException;
-import java.sql.*;
 import java.net.URL;
+import java.sql.SQLException;
 import java.util.ResourceBundle;
 
-public class Controller1 implements Initializable {
+public class Controller implements Initializable {
     @FXML
     private Label labelForm;
     @FXML
@@ -91,7 +88,7 @@ public class Controller1 implements Initializable {
     @FXML
     private Button buttonGeneratePdf;
 
-    private final Logger controllerLogger = LogManager.getLogger(Controller1.class.getName());
+    private final Logger controllerLogger = LogManager.getLogger(Controller.class.getName());
     private final appLogic logicApp = new appLogic();
     private final crudLogicMeetings logicCrudMeeting = new crudLogicMeetings();
     private final crudLogicNotes logicCrudNotes = new crudLogicNotes();

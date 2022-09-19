@@ -1,4 +1,4 @@
-package com.example.meetingplanner_demo.Models;
+package com.example.meetingplanner_demo.Model;
 
 import com.example.meetingplanner_demo.Main;
 

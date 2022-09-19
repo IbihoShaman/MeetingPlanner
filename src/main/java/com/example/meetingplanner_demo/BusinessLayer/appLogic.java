@@ -1,16 +1,19 @@
 package com.example.meetingplanner_demo.BusinessLayer;
 
-import com.example.meetingplanner_demo.DataAccessLayer.DB;
-import com.example.meetingplanner_demo.Models.Meetings;
-import com.example.meetingplanner_demo.Models.Notes;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
-
+import com.example.meetingplanner_demo.DataAccessLayer.dbAccessMeetings;
+import com.example.meetingplanner_demo.DataAccessLayer.dbAccessNotes;
+import com.example.meetingplanner_demo.Model.Meetings;
+import com.example.meetingplanner_demo.Model.Notes;
 import com.itextpdf.io.font.constants.StandardFonts;
 import com.itextpdf.kernel.font.PdfFontFactory;
-import com.itextpdf.kernel.pdf.*;
+import com.itextpdf.kernel.pdf.PdfDocument;
+import com.itextpdf.kernel.pdf.PdfWriter;
 import com.itextpdf.layout.Document;
-import com.itextpdf.layout.element.*;
+import com.itextpdf.layout.element.List;
+import com.itextpdf.layout.element.ListItem;
+import com.itextpdf.layout.element.Paragraph;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -22,10 +25,14 @@ import java.time.format.DateTimeParseException;
 import java.time.format.ResolverStyle;
 
 public class appLogic {
-    DB database = new DB(configurationLogic.getConfiguration("connectionString"));
-    public DB getDatabase() {
-        return database;
+    //DB database = new DB(configurationLogic.getConfiguration("connectionString"));
+    private final dbAccessMeetings DBMeetings = new dbAccessMeetings();
+    private final dbAccessNotes DBNotes = new dbAccessNotes();
+
+    public dbAccessMeetings getDBMeetings() {
+        return DBMeetings;
     }
+    public dbAccessNotes getDBNotes() { return  DBNotes; }
 
     private Logger appLogicLogger = LogManager.getLogger(appLogic.class.getName());
     private Meetings selectedMeeting;
@@ -41,12 +48,12 @@ public class appLogic {
     //creates an observable list, calls database method to fill the list with entries and returns it
     public ObservableList<Meetings> getMeetingList() {
         ObservableList<Meetings> meetingList = FXCollections.observableArrayList();
-        database.fetchMeetingData(meetingList);
+        DBMeetings.fetchMeetingData(meetingList);
         return meetingList;
     }
     public ObservableList<Notes> getNotesList(int parentID){
         ObservableList<Notes> notesList = FXCollections.observableArrayList();
-        database.fetchNoteData(parentID, notesList);
+        DBNotes.fetchNoteData(parentID, notesList);
         return notesList;
     }
 
