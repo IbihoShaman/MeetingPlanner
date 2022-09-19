@@ -34,12 +34,8 @@ public class appLogic {
     }
     public dbAccessNotes getDBNotes() { return  DBNotes; }
 
-    private Logger appLogicLogger = LogManager.getLogger(appLogic.class.getName());
+    private final Logger appLogicLogger = LogManager.getLogger(appLogic.class.getName());
     private Meetings selectedMeeting;
-
-    private int selectedMeetingID;
-    public void setSelectedMeetingID(int selectedMeetingID) { this.selectedMeetingID = selectedMeetingID; }
-    public int getSelectedMeetingID() { return selectedMeetingID; }
 
     public void setSelectedMeeting(Meetings selectedMeeting){ this.selectedMeeting = selectedMeeting; }
     public Meetings getSelectedMeeting(){ return this.selectedMeeting; }

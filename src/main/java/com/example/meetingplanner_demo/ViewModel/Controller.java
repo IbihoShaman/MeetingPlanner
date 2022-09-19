@@ -143,8 +143,7 @@ public class Controller implements Initializable {
     public void displayMeetingDataOnClick(){
         try {
             logicApp.setSelectedMeeting(tableMeetings.getSelectionModel().getSelectedItem());
-            //logicApp.setSelectedMeetingID(logicApp.getSelectedMeetingID());
-            System.out.println(logicApp.getSelectedMeeting().getTitle());
+            //System.out.println(logicApp.getSelectedMeeting().getTitle());
 
             inputID.setText("" + logicApp.getSelectedMeeting().getID());
             inputTitle.setText(logicApp.getSelectedMeeting().getTitle());
@@ -290,12 +289,11 @@ public class Controller implements Initializable {
         controllerLogger.trace("Passed through addNoteOnClick() with code: " + executionCode);
     }
     public void updateNoteOnClick() throws SQLException {
-        System.out.println("Heloooooo");
         String modifier = "updateNote";
         int executionCode = logicCrudNotes.updateNote(modifier, inputNoteOverview, inputNoteID, logicApp.getSelectedMeeting());
         switch (executionCode){
             case 0:
-                System.out.println(logicApp.getSelectedMeeting().getTitle());
+                //.out.println(logicApp.getSelectedMeeting().getTitle());
                 labelNoteOverview.setText("Note ID: " + inputNoteID.getText() + " updated");
                 labelNoteOverview.setTextFill(Color.color(0, 0.9, 0.2));
                 showNotes(logicApp.getSelectedMeeting().getID());
