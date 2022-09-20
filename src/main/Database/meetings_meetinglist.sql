@@ -16,31 +16,32 @@
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
 --
--- Table structure for table `meetingnotes`
+-- Table structure for table `meetinglist`
 --
 
-DROP TABLE IF EXISTS `meetingnotes`;
+DROP TABLE IF EXISTS `meetinglist`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `meetingnotes` (
-  `noteID` int NOT NULL AUTO_INCREMENT,
-  `meetingID` int NOT NULL,
-  `noteText` text NOT NULL,
-  PRIMARY KEY (`noteID`),
-  UNIQUE KEY `noteID_UNIQUE` (`noteID`),
-  KEY `meetingID_idx` (`meetingID`),
-  CONSTRAINT `meetingID` FOREIGN KEY (`meetingID`) REFERENCES `meetinglist` (`meetingID`)
-) ENGINE=InnoDB AUTO_INCREMENT=22 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+CREATE TABLE `meetinglist` (
+  `meetingID` int NOT NULL AUTO_INCREMENT,
+  `title` varchar(45) NOT NULL,
+  `startDate` varchar(45) NOT NULL,
+  `startTime` varchar(45) NOT NULL,
+  `endDate` varchar(45) NOT NULL,
+  `endTime` varchar(45) NOT NULL,
+  `agenda` text NOT NULL,
+  PRIMARY KEY (`meetingID`)
+) ENGINE=InnoDB AUTO_INCREMENT=64 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `meetingnotes`
+-- Dumping data for table `meetinglist`
 --
 
-LOCK TABLES `meetingnotes` WRITE;
-/*!40000 ALTER TABLE `meetingnotes` DISABLE KEYS */;
-INSERT INTO `meetingnotes` VALUES (6,39,'Testing note'),(7,40,'this is a test note update'),(8,40,'adding note test'),(10,39,'add note test2'),(11,39,'hello'),(16,40,'note test'),(18,43,'test note'),(20,47,'All participants have been informed'),(21,47,'Conference room has been booked');
-/*!40000 ALTER TABLE `meetingnotes` ENABLE KEYS */;
+LOCK TABLES `meetinglist` WRITE;
+/*!40000 ALTER TABLE `meetinglist` DISABLE KEYS */;
+INSERT INTO `meetinglist` VALUES (1,'TestMeeting','01/01/2000','00:00','31/12/2999','23:59','Test'),(47,'Weekly Standup','13/09/2022','15:00','13/09/2022','15:30','1.First Item\n2.Second Item\n3.Third Item'),(56,'Shopping','02/09/2022','12:30','02/09/2022','13:00','1. Item one\n2. Item two\n3. Item three'),(57,'Panel Exam','30/09/2022','12:30','30/09/2022','13:00','1. Improvise\n2. ???\n3.Profit ');
+/*!40000 ALTER TABLE `meetinglist` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
