@@ -1,6 +1,5 @@
 package com.example.meetingplanner_demo.Model;
 
-import com.example.meetingplanner_demo.Main;
 
 public class Notes {
     private final Integer noteID;
@@ -15,6 +14,5 @@ public class Notes {
         this.noteID = noteID;
         this.parentMeetingID = parentMeetingID;
         this.noteText = noteText;
-        Main.logger.trace("Note object created with ID: " + this.getNoteID() + " and parentID: " + this.getParentMeetingID());
     }
 }

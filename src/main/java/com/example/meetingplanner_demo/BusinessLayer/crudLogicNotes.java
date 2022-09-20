@@ -13,11 +13,11 @@ public class crudLogicNotes {
     private final appLogic logicApp = new appLogic();
     private int answerCode = 0;
 
-    public int addNote(String modifier, TextArea noteText, Meetings selectedMeeting){
-        int validatorCode = crudNoteValidator(modifier, noteText, null, selectedMeeting);
+    public int addNote(String modifier, TextArea noteText, int selectedID, Meetings selectedMeeting){
+        int validatorCode = crudNoteValidator(modifier, noteText, null, selectedMeeting, selectedID);
         switch(validatorCode){
             case 0:
-                String query = "INSERT INTO meetingnotes (meetingID, noteText) VALUES ('" + selectedMeeting.getID() + "','" + noteText.getText() + "')";
+                String query = "INSERT INTO meetingnotes (meetingID, noteText) VALUES ('" + selectedID + "','" + noteText.getText() + "')";
                 logicApp.getDBNotes().addNote(query);
                 answerCode = 0;
                 break;
@@ -35,8 +35,8 @@ public class crudLogicNotes {
         }
         return answerCode;
     }
-    public int updateNote(String modifier, TextArea noteText, TextField noteID, Meetings selectedMeeting) throws SQLException {
-        int validatorCode = crudNoteValidator(modifier, noteText, noteID, selectedMeeting);
+    public int updateNote(String modifier, TextArea noteText, TextField noteID, Meetings selectedMeeting, int selectedID) throws SQLException {
+        int validatorCode = crudNoteValidator(modifier, noteText, noteID, selectedMeeting, selectedID);
         System.out.println("Validator: " + validatorCode);
         switch (validatorCode){
             case 0:
@@ -63,8 +63,8 @@ public class crudLogicNotes {
         }
         return answerCode;
     }
-    public int deleteNote(String modifier, TextField noteID, Meetings selectedMeeting){
-        int validatorCode = crudNoteValidator(modifier, null, noteID, selectedMeeting);
+    public int deleteNote(String modifier, TextField noteID, Meetings selectedMeeting, int selectedMeetingID){
+        int validatorCode = crudNoteValidator(modifier, null, noteID, selectedMeeting, selectedMeetingID);
          switch (validatorCode){
              case 0:
                  String query = "DELETE FROM meetingnotes WHERE noteID = " + noteID.getText();
@@ -84,12 +84,11 @@ public class crudLogicNotes {
         return answerCode;
     }
 
-    public int crudNoteValidator(String modifier, TextArea noteText, TextField noteID, Meetings selectedMeeting){
-        System.out.println("Method validator");
+    public int crudNoteValidator(String modifier, TextArea noteText, TextField noteID, Meetings selectedMeeting, int selectedMeetingID){
         int answerCode = 0;
         switch (modifier){
             case "addNote":
-                if(selectedMeeting == null){
+                if(selectedMeeting == null || selectedMeetingID == 0){
                     answerCode = -1;
                 } else if(noteText.getText().isEmpty()){
                     answerCode = -2;
@@ -98,7 +97,7 @@ public class crudLogicNotes {
                 }
                 break;
             case "updateNote":
-                if(selectedMeeting == null){
+                if(selectedMeeting == null || selectedMeetingID == 0){
                     answerCode = -1;
                 } else if(noteText.getText().isEmpty()){
                     answerCode = -2;

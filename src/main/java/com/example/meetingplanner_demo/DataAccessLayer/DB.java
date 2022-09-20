@@ -45,7 +45,7 @@ public class DB {
         }
         DBlogger.trace("Query execution successful");
     }
-
+    // executes update query and checks if any rows with corresponding values where found and updated
     public boolean checkUpdate(String query) throws SQLException {
         int rows;
         Connection conn = getConnection();

@@ -143,6 +143,8 @@ public class Controller implements Initializable {
     public void displayMeetingDataOnClick(){
         try {
             logicApp.setSelectedMeeting(tableMeetings.getSelectionModel().getSelectedItem());
+            logicApp.setSelectedID(logicApp.getSelectedMeeting().getID());
+            //System.out.println("Display: " + logicApp.getSelectedID());
             //System.out.println(logicApp.getSelectedMeeting().getTitle());
 
             inputID.setText("" + logicApp.getSelectedMeeting().getID());
@@ -172,8 +174,14 @@ public class Controller implements Initializable {
 
     public void createMeetingOnClick(){
         String modifier = "createMeeting";
-        int executionCode = logicCrudMeeting.createMeeting(modifier, inputTitle, inputStart,
-                inputStartTime, inputEnd, inputEndTime, inputAgenda, inputNote);
+        Meetings newMeeting = new Meetings.meetingsBuilder(inputTitle.getText())
+                .startDate(logicApp.parseDateToString(inputStart.getValue()))
+                .startTime(inputStartTime.getText())
+                .endDate(logicApp.parseDateToString(inputEnd.getValue()))
+                .endTime(inputEndTime.getText())
+                .agenda(inputAgenda.getText())
+                .build();
+        int executionCode = logicCrudMeeting.createMeeting(modifier, newMeeting, inputNote);
         switch (executionCode){
             case 0:
                 labelForm.setText("Meeting successfully created");
@@ -199,8 +207,14 @@ public class Controller implements Initializable {
     }
     public void updateMeetingOnClick() throws SQLException {
         String modifier = "updateMeeting";
-        int executionCode = logicCrudMeeting.updateMeeting(modifier, inputID, inputTitle, inputStart,
-                inputStartTime, inputEnd, inputEndTime, inputAgenda, inputNote);
+        Meetings newMeeting = new Meetings.meetingsBuilder(inputTitle.getText())
+                .startDate(logicApp.parseDateToString(inputStart.getValue()))
+                .startTime(inputStartTime.getText())
+                .endDate(logicApp.parseDateToString(inputEnd.getValue()))
+                .endTime(inputEndTime.getText())
+                .agenda(inputAgenda.getText())
+                .build();
+        int executionCode = logicCrudMeeting.updateMeeting(modifier, inputID, newMeeting, inputNote);
         switch (executionCode){
             case 0:
                 showMeetings();
@@ -243,6 +257,9 @@ public class Controller implements Initializable {
         switch (executionCode){
             case 0:
                 showMeetings();
+                if(logicApp.getSelectedID() == Integer.parseInt(inputID.getText())){
+                    logicApp.setSelectedID(0);
+                }
                 labelForm.setText("Meeting successfully deleted");
                 labelForm.setTextFill(Color.color(0, 0.9, 0.2));
                 break;
@@ -261,7 +278,7 @@ public class Controller implements Initializable {
 
     public void addNoteOnClick(){
         String modifier = "addNote";
-        int executionCode = logicCrudNotes.addNote(modifier, inputNoteOverview, logicApp.getSelectedMeeting());
+        int executionCode = logicCrudNotes.addNote(modifier, inputNoteOverview, logicApp.getSelectedID(), logicApp.getSelectedMeeting());
         switch (executionCode){
             case 0:
                 labelNoteOverview.setText("Note added to meeting ID: " + logicApp.getSelectedMeeting().getID());
@@ -290,7 +307,7 @@ public class Controller implements Initializable {
     }
     public void updateNoteOnClick() throws SQLException {
         String modifier = "updateNote";
-        int executionCode = logicCrudNotes.updateNote(modifier, inputNoteOverview, inputNoteID, logicApp.getSelectedMeeting());
+        int executionCode = logicCrudNotes.updateNote(modifier, inputNoteOverview, inputNoteID, logicApp.getSelectedMeeting(), logicApp.getSelectedID());
         switch (executionCode){
             case 0:
                 //.out.println(logicApp.getSelectedMeeting().getTitle());
@@ -328,7 +345,7 @@ public class Controller implements Initializable {
     }
     public void deleteNoteOnClick(){
         String modifier = "deleteNote";
-        int executionCode = logicCrudNotes.deleteNote(modifier, inputNoteID, logicApp.getSelectedMeeting());
+        int executionCode = logicCrudNotes.deleteNote(modifier, inputNoteID, logicApp.getSelectedMeeting(), logicApp.getSelectedID());
         switch (executionCode){
             case 0:
                 labelNoteOverview.setText("Note with ID: " + inputNoteID.getText() + " deleted: " + logicApp.getSelectedMeeting().getID());

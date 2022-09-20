@@ -1,7 +1,5 @@
 package com.example.meetingplanner_demo.Model;
 
-import com.example.meetingplanner_demo.Main;
-
 public class Meetings {
     private final Integer ID;
     private final String title;
@@ -27,14 +25,57 @@ public class Meetings {
     }
     public String getAgenda(){ return agenda; }
 
-    public Meetings(Integer ID, String title, String startDate, String startTime, String endDate, String endTime, String agenda) {
-        this.ID = ID;
-        this.title = title;
-        this.startDate = startDate;
-        this.startTime = startTime;
-        this.endDate = endDate;
-        this.endTime = endTime;
-        this.agenda = agenda;
-        Main.logger.trace("Meeting object created with meetingID: " + this.getID());
+    public Meetings(meetingsBuilder builder){
+        this.ID = builder.ID;
+        this.title = builder.title;
+        this.startDate = builder.startDate;
+        this.startTime = builder.startTime;
+        this.endDate = builder.endDate;
+        this.endTime = builder.endTime;
+        this.agenda = builder.agenda;
+    }
+        //The Builder design pattern helps with creating meetings with different amount of attributes without many constructors
+        public static class meetingsBuilder {
+            private Integer ID;
+            private final String title;
+            private String startDate;
+            private String startTime;
+            private String endDate;
+            private String endTime;
+            private String agenda;
+
+            public meetingsBuilder(String title){
+                if(title.isEmpty()){
+                    this.title = "DefaultTitle";
+                } else
+                    this.title = title;
+            }
+            public meetingsBuilder ID(int ID){
+                this.ID = ID;
+                return this;
+            }
+            public meetingsBuilder startDate(String startDate){
+                this.startDate = startDate;
+                return this;
+            }
+            public meetingsBuilder startTime(String startTime){
+                this.startTime = startTime;
+                return this;
+            }
+            public meetingsBuilder endDate(String endDate){
+                this.endDate = endDate;
+                return this;
+            }
+            public meetingsBuilder endTime(String endTime){
+                this.endTime = endTime;
+                return this;
+            }
+            public meetingsBuilder agenda(String agenda){
+                this.agenda = agenda;
+                return this;
+            }
+            public Meetings build(){
+                return new Meetings(this);
+            }
     }
 }

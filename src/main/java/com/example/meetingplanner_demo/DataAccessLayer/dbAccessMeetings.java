@@ -27,8 +27,14 @@ public class dbAccessMeetings {
             results = statement.executeQuery(query);
             Meetings meeting;
             while(results.next()){
-                meeting = new Meetings(results.getInt("meetingID"), results.getString("title"), results.getString("startDate"), results.getString("startTime"), results.getString("endDate"),
-                        results.getString("endTime"), results.getString("agenda"));
+                meeting = new Meetings.meetingsBuilder(results.getString("title"))
+                        .ID(results.getInt("meetingID"))
+                        .startDate(results.getString("startDate"))
+                        .startTime(results.getString("startTime"))
+                        .endDate(results.getString("endDate"))
+                        .endTime(results.getString("endTime"))
+                        .agenda(results.getString("agenda"))
+                        .build();
                 meetingList.add(meeting);
             }
         }catch(Exception e){
