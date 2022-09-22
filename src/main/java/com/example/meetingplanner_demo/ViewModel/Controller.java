@@ -93,11 +93,11 @@ public class Controller implements Initializable {
     private final crudLogicMeetings logicCrudMeeting = new crudLogicMeetings();
     private final crudLogicNotes logicCrudNotes = new crudLogicNotes();
 
-
     //populates the meeting table view on launch
     public void initialize(URL url, ResourceBundle resourceBundle) {
         showMeetings();
     }
+
 
     //calls appLogic function to fetch list of all Meetings from the database and prints them in the Meeting table view
     public void showMeetings(){
@@ -135,9 +135,10 @@ public class Controller implements Initializable {
             default:
                 labelPdf.setText("Something went wrong");
                 labelPdf.setTextFill(Color.color(1, 0.1, 0.2 ));
-                controllerLogger.error("Default case log at generatePdf(); case: " + answerCode);
+                controllerLogger.error("Default case log at generatePdfOnClick(); case: " + answerCode);
                 break;
         }
+        controllerLogger.trace("Passed through generatePdfOnClick() with code: " + answerCode);
     }
     //when user clicks on a meeting in the table, fills input fields and labels with corresponding data
     public void displayMeetingDataOnClick(){

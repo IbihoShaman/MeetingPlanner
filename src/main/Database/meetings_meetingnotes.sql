@@ -30,7 +30,7 @@ CREATE TABLE `meetingnotes` (
   UNIQUE KEY `noteID_UNIQUE` (`noteID`),
   KEY `meetingID_idx` (`meetingID`),
   CONSTRAINT `meetingID` FOREIGN KEY (`meetingID`) REFERENCES `meetinglist` (`meetingID`)
-) ENGINE=InnoDB AUTO_INCREMENT=20 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=46 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -39,7 +39,7 @@ CREATE TABLE `meetingnotes` (
 
 LOCK TABLES `meetingnotes` WRITE;
 /*!40000 ALTER TABLE `meetingnotes` DISABLE KEYS */;
-INSERT INTO `meetingnotes` VALUES (6,39,'Testing note'),(7,40,'this is a test note update'),(8,40,'adding note test'),(10,39,'add note test2'),(11,39,'hello'),(16,40,'note test'),(18,43,'test note');
+INSERT INTO `meetingnotes` VALUES (1,1,'Adding note from crudLogicNotes unit test'),(20,47,'All participants have been informed'),(21,47,'Conference room has been booked'),(32,56,'Supermarket closed on sunday'),(33,56,'Use coupons'),(35,57,'Add unit tests'),(36,57,'Finish protocol'),(44,1,'Adding note from crudLogicNotes unit test'),(45,1,'Adding note from crudLogicNotes unit test');
 /*!40000 ALTER TABLE `meetingnotes` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;

@@ -43,7 +43,7 @@ public class Meetings {
         this.endTime = builder.endTime;
         this.agenda = builder.agenda;
     }
-        //The Builder design pattern helps with creating meetings with different amount of attributes without many constructors
+//The Builder design pattern helps with creating meetings with different amount of attributes without multiple constructors
         public static class meetingsBuilder {
             private Integer ID;
             private final String title;

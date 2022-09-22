@@ -27,15 +27,17 @@ public class dbAccessMeetings {
             results = statement.executeQuery(query);
             Meetings meeting;
             while(results.next()){
-                meeting = new Meetings.meetingsBuilder(results.getString("title"))
-                        .ID(results.getInt("meetingID"))
-                        .startDate(results.getString("startDate"))
-                        .startTime(results.getString("startTime"))
-                        .endDate(results.getString("endDate"))
-                        .endTime(results.getString("endTime"))
-                        .agenda(results.getString("agenda"))
-                        .build();
-                meetingList.add(meeting);
+                if(!(results.getInt("meetingID") == 1)) {
+                    meeting = new Meetings.meetingsBuilder(results.getString("title"))
+                            .ID(results.getInt("meetingID"))
+                            .startDate(results.getString("startDate"))
+                            .startTime(results.getString("startTime"))
+                            .endDate(results.getString("endDate"))
+                            .endTime(results.getString("endTime"))
+                            .agenda(results.getString("agenda"))
+                            .build();
+                    meetingList.add(meeting);
+                }
             }
         }catch(Exception e){
             DBMeetingsLogger.error("Could not fetch meetings from database");
