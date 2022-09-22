@@ -17,6 +17,34 @@ public class dbAccessMeetings {
     private final dbAccessNotes DBNotes = new dbAccessNotes();
     public static Logger DBMeetingsLogger = LogManager.getLogger(Main.class.getName());
 
+    ////Creating a meeting in the DB
+    public void addMeeting(String query, String title, String note){
+        //adds meeting into meetingList DB table
+        database.execute(query);
+        //if user entered a note, insert it with corresponding meeting ID
+        if(!note.isBlank()) {
+            int currentID = 0;
+            //get meeting ID to which the note will be appended (suboptimal solution might change later)
+            Connection conn = database.getConnection();
+            query = "SELECT meetingID FROM meetinglist WHERE title = '" + title + "'";
+            Statement statement;
+            try {
+                statement = conn.createStatement();
+                ResultSet result;
+                result = statement.executeQuery(query);
+                while (result.next()) {
+                    currentID = result.getInt(1);
+                }
+            }catch (Exception e){
+                DBMeetingsLogger.error("Error fetching meetingID in createMeeting()");
+                e.printStackTrace();
+            }
+            // inserts note into noteList table
+            query = "INSERT INTO meetingnotes (noteText, meetingID) VALUES ('" + note + "','" + currentID + "')";
+            DBNotes.addNote(query);
+        }
+    }
+    //Reading meetings from the DB
     public void fetchMeetingData(ObservableList<Meetings> meetingList){
         Connection conn = database.getConnection();
         String query = "SELECT * FROM meetinglist";
@@ -45,37 +73,11 @@ public class dbAccessMeetings {
         }
         DBMeetingsLogger.trace("Meeting list successfully filled with meetings");
     }
-
-    ////Meetings
-    public void addMeeting(String query, String title, String note){
-        //adds meeting into meetingList DB table
-        database.execute(query);
-        //if user entered a note, insert it with corresponding meeting ID
-        if(!note.isBlank()) {
-            int currentID = 0;
-            //get meeting ID to which the note will be appended (suboptimal solution might change later)
-            Connection conn = database.getConnection();
-            query = "SELECT meetingID FROM meetinglist WHERE title = '" + title + "'";
-            Statement statement;
-            try {
-                statement = conn.createStatement();
-                ResultSet result;
-                result = statement.executeQuery(query);
-                while (result.next()) {
-                    currentID = result.getInt(1);
-                }
-            }catch (Exception e){
-                DBMeetingsLogger.error("Error fetching meetingID in createMeeting()");
-                e.printStackTrace();
-            }
-            // inserts note into noteList table
-            query = "INSERT INTO meetingnotes (noteText, meetingID) VALUES ('" + note + "','" + currentID + "')";
-            DBNotes.addNote(query);
-        }
-    }
+    //Updating a meeting in the DB
     public boolean updateMeeting(String query) throws SQLException {
         return database.checkUpdate(query);
     }
+    //Deleting a meeting in the DB
     public void deleteMeeting(String queryNote, String queryMeeting){
         //deleting the entries from the note table first
         database.execute(queryNote);

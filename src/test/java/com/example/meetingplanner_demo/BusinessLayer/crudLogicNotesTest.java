@@ -4,7 +4,6 @@ import com.example.meetingplanner_demo.Model.Meetings;
 import javafx.application.Platform;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
-import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
@@ -16,8 +15,6 @@ class crudLogicNotesTest {
     private static Meetings testMeeting;
     private final crudLogicNotes logicNotes = new crudLogicNotes();
     private int answerCode;
-    //private static TextArea noteText = new TextArea();
-    //private static TextField noteID = new TextField();
 
     @BeforeAll
     static void beforeAll(){

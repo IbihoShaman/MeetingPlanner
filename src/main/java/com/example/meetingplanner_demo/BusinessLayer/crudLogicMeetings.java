@@ -1,6 +1,8 @@
 package com.example.meetingplanner_demo.BusinessLayer;
 
 import com.example.meetingplanner_demo.Model.Meetings;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import org.apache.logging.log4j.LogManager;
