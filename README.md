@@ -6,8 +6,8 @@
 - PdfName (Name of pdf target file for meeting pdf generation)
 
 ### Database
--> The Database consists of a meetingList and a meetingNotes table
--> The 'Database' folder contains sql files of both tables filled with placeholder entries
+- The Database consists of a meetingList and a meetingNotes table
+- The 'Database' folder contains sql files of both tables filled with placeholder entries
 
 ### Github
 -> Link to the GitHub repository: https://github.com/IbihoShaman/MeetingPlanner
