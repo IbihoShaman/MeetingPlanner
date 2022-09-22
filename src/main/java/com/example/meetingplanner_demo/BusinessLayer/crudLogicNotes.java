@@ -37,7 +37,6 @@ public class crudLogicNotes {
     }
     public int updateNote(String modifier, TextArea noteText, TextField noteID, Meetings selectedMeeting, int selectedID) throws SQLException {
         int validatorCode = crudNoteValidator(modifier, noteText, noteID, selectedMeeting, selectedID);
-        System.out.println("Validator: " + validatorCode);
         switch (validatorCode){
             case 0:
                 String query = "UPDATE meetingnotes SET noteText = '" + noteText.getText() +

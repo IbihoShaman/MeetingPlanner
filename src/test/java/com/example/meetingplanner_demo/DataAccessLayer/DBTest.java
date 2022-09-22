@@ -11,7 +11,7 @@ class DBTest {
 
     @Test
     void getConnection() {
-
+        assertNotNull(database.getConnection());
     }
 
     @Test

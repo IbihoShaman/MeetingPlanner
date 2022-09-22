@@ -8,10 +8,19 @@ import static org.junit.jupiter.api.Assertions.*;
 class configurationLogicTest {
 
     @Test
-    void getConfigurationTest() {
+    void testConfigConnectionString() {
         assertEquals(configurationLogic.getConfiguration("connectionString"),"jdbc:mysql://localhost:3306/meetings" );
+    }
+    @Test
+    void testConfigUser(){
         assertEquals(configurationLogic.getConfiguration("DBUser"), "root");
+    }
+    @Test
+    void testConfigPassword(){
         assertEquals(configurationLogic.getConfiguration("DBPassword"), "root");
+    }
+    @Test
+    void testConfigPDF(){
         assertEquals(configurationLogic.getConfiguration("PdfName"), "Meeting.pdf");
     }
 

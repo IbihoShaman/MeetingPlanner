@@ -40,9 +40,7 @@ public class dbAccessNotes {
     public void addNote(String query){
         database.execute(query);
     }
-    public boolean updateNote(String query) throws SQLException {
-        return database.checkUpdate(query);
-    }
+    public boolean updateNote(String query) throws SQLException { return database.checkUpdate(query); }
     public void deleteNote(String query){
         database.execute(query);
     }

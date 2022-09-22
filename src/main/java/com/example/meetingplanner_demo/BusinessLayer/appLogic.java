@@ -119,7 +119,7 @@ public class appLogic {
         int answerCode = 0;
         switch (modifier){
             case "generatePdf":
-                if(selectedMeeting == null){
+                if(selectedMeeting == null || selectedID == 0){
                     answerCode = -1;
                 }
                 break;
@@ -137,6 +137,7 @@ public class appLogic {
     public String parseDateToString(LocalDate date){
         return date.format(DateTimeFormatter.ofPattern("dd/MM/yyyy"));
     }
+
     public boolean parseTime(String time){
         try {
             DateTimeFormatter strictTimeFormatter = DateTimeFormatter.ofPattern("HH:mm")
