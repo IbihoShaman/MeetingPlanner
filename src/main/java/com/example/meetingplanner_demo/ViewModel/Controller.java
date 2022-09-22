@@ -156,7 +156,7 @@ public class Controller implements Initializable {
             inputEndTime.setText(logicApp.getSelectedMeeting().getEndTime());
             inputAgenda.setText(logicApp.getSelectedMeeting().getAgenda());
 
-            labelTitle.setText("TITLE : " + logicApp.getSelectedMeeting().getTitle());
+            labelTitle.setText(logicApp.getSelectedMeeting().getTitle());
             labelStart.setText("FROM : " + logicApp.getSelectedMeeting().getStartDate() + " " + logicApp.getSelectedMeeting().getStartTime());
             labelEnd.setText("TO : " + logicApp.getSelectedMeeting().getEndDate() + " " + logicApp.getSelectedMeeting().getEndTime());
             labelAgenda.setText("AGENDA : \n" + logicApp.getSelectedMeeting().getAgenda());
